@@ -1,0 +1,3166 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TS Asistentas — Litgrid AB pirkimų techninių specifikacijų asistentas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,300;0,6..12,400;0,6..12,600;0,6..12,700;0,6..12,800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --color-emerald: #00A072;
+  --color-emerald-50: #16C492;
+  --color-emerald-120: #128A76;
+
+  --color-graphite: #2E3641;
+  --color-graphite-50: #737483;
+  --color-graphite-30: #C7CDD3;
+  --color-graphite-15: #E1E2E4;
+  --color-graphite-5: #EFF1F1;
+
+  --color-blue: #00667D;
+  --color-cyan: #00A5C4;
+  --color-lime: #85BC28;
+  --color-green: #459D54;
+  --color-lemon: #BAF54D;
+
+  --color-green-15: #D7EEDB;
+  --color-green-5: #EFF9F1;
+  --color-cyan-5: #E8F7F9;
+
+  --color-white: #FFFFFF;
+  --color-error: #DB354A;
+  --color-error-5: #FBEBEE;
+  --color-warning: #FAB03B;
+  --color-warning-5: #FEF6E8;
+
+  --font-base: "Nunito Sans", Arial, sans-serif;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
+  --space-6: 64px;
+
+  --container-max: 1280px;
+
+  --shadow-subtle: 0 8px 24px rgba(46, 54, 65, 0.08);
+  --shadow-card: 0 1px 2px rgba(46, 54, 65, 0.04);
+  --transition-fast: 180ms ease;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-base);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--color-graphite);
+  background: var(--color-graphite-5);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--color-emerald); text-decoration: none; }
+a:hover { color: var(--color-emerald-120); text-decoration: underline; }
+
+/* === LAYOUT === */
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  background: var(--color-white);
+  border-bottom: 1px solid var(--color-graphite-15);
+  padding: var(--space-2) var(--space-3);
+}
+
+.app-header-inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.brand-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--color-emerald) 0%, var(--color-emerald-50) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: -0.5px;
+}
+
+.brand-text h1 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-graphite);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.brand-text small {
+  font-size: 12px;
+  color: var(--color-graphite-50);
+  font-weight: 400;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-graphite-50);
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--color-graphite-5);
+}
+
+.header-status .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-graphite-30);
+}
+
+.header-status.connected .dot { background: var(--color-emerald); }
+.header-status.error .dot { background: var(--color-error); }
+
+/* === TABS === */
+.app-tabs {
+  background: var(--color-white);
+  border-bottom: 1px solid var(--color-graphite-15);
+  padding: 0 var(--space-3);
+}
+
+.app-tabs-inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 14px 20px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-graphite-50);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--color-graphite);
+}
+
+.tab-btn.active {
+  color: var(--color-emerald);
+  border-bottom-color: var(--color-emerald);
+}
+
+.tab-btn .tab-icon {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tab-btn .tab-badge {
+  font-size: 11px;
+  background: var(--color-emerald);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  display: none;
+}
+
+.tab-btn.has-badge .tab-badge { display: inline-block; }
+
+/* === MAIN === */
+.app-main {
+  flex: 1;
+  padding: var(--space-4) var(--space-3);
+}
+
+.app-main-inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* === GRID & CARDS === */
+.grid {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.grid-2 { grid-template-columns: 1fr 1fr; }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-sidebar { grid-template-columns: 1fr 320px; }
+
+@media (max-width: 960px) {
+  .grid-2, .grid-3, .grid-sidebar { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--color-white);
+  border: 1px solid var(--color-graphite-15);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  box-shadow: var(--shadow-card);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+  gap: var(--space-2);
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-graphite);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-title .title-icon {
+  color: var(--color-emerald);
+  width: 20px;
+  height: 20px;
+}
+
+.card-subtitle {
+  font-size: 13px;
+  color: var(--color-graphite-50);
+  margin: 0;
+}
+
+.card-section {
+  padding-top: var(--space-2);
+  margin-top: var(--space-2);
+  border-top: 1px solid var(--color-graphite-15);
+}
+
+/* === HERO === */
+.hero {
+  background: linear-gradient(135deg, var(--color-graphite) 0%, #1a4044 50%, var(--color-blue) 100%);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-4);
+  color: white;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: var(--space-3);
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(22, 196, 146, 0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  max-width: 720px;
+}
+
+.hero h2 {
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0 0 var(--space-2);
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+.hero h2 .accent { color: var(--color-emerald-50); }
+
+.hero p {
+  font-size: 16px;
+  margin: 0 0 var(--space-3);
+  opacity: 0.92;
+  line-height: 1.6;
+}
+
+.hero-meta {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.hero-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-meta-item svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-emerald-50);
+}
+
+/* === FORMS === */
+.form-group {
+  margin-bottom: var(--space-2);
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-graphite);
+  margin-bottom: 6px;
+}
+
+.form-label .req { color: var(--color-error); }
+.form-label .help { color: var(--color-graphite-50); font-weight: 400; font-size: 12px; }
+
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--color-graphite);
+  background: var(--color-white);
+  border: 1px solid var(--color-graphite-30);
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+}
+
+.form-textarea {
+  min-height: 220px;
+  resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--color-emerald);
+  box-shadow: 0 0 0 3px rgba(0, 160, 114, 0.12);
+}
+
+.form-help {
+  font-size: 12px;
+  color: var(--color-graphite-50);
+  margin-top: 4px;
+}
+
+/* === BUTTONS === */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--color-emerald);
+  color: var(--color-white);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-emerald-120);
+}
+
+.btn-secondary {
+  background: var(--color-white);
+  color: var(--color-graphite);
+  border-color: var(--color-graphite-30);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-graphite-5);
+  border-color: var(--color-graphite-50);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-emerald);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--color-green-5);
+}
+
+.btn-danger {
+  background: var(--color-white);
+  color: var(--color-error);
+  border-color: rgba(219, 53, 74, 0.3);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: var(--color-error-5);
+}
+
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-lg { padding: 14px 28px; font-size: 15px; }
+
+.btn-block { width: 100%; }
+
+.btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* === FILE UPLOAD === */
+.file-drop {
+  border: 2px dashed var(--color-graphite-30);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  text-align: center;
+  background: var(--color-graphite-5);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.file-drop:hover, .file-drop.dragover {
+  border-color: var(--color-emerald);
+  background: var(--color-green-5);
+}
+
+.file-drop-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto var(--space-1);
+  color: var(--color-emerald);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-green-5);
+  border-radius: 50%;
+}
+
+.file-drop p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-graphite);
+  font-weight: 600;
+}
+
+.file-drop small {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-graphite-50);
+  font-weight: 400;
+}
+
+.file-input { display: none; }
+
+.file-list {
+  margin-top: var(--space-2);
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--color-graphite-5);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+}
+
+.file-item-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-emerald);
+  flex-shrink: 0;
+}
+
+.file-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-item-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-graphite);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-item-meta {
+  font-size: 12px;
+  color: var(--color-graphite-50);
+}
+
+.file-item-remove {
+  background: none;
+  border: none;
+  color: var(--color-graphite-50);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+.file-item-remove:hover { color: var(--color-error); background: var(--color-error-5); }
+
+/* === BADGES & STATUSES === */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-error { background: var(--color-error-5); color: var(--color-error); }
+.badge-warning { background: var(--color-warning-5); color: #B47A00; }
+.badge-success { background: var(--color-green-5); color: var(--color-green); }
+.badge-info { background: var(--color-cyan-5); color: var(--color-blue); }
+.badge-neutral { background: var(--color-graphite-5); color: var(--color-graphite-50); }
+
+/* === SCORE & METRICS === */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-2);
+}
+
+.metric {
+  background: var(--color-graphite-5);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  border-left: 3px solid var(--color-emerald);
+}
+
+.metric-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-graphite-50);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.metric-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-graphite);
+  line-height: 1;
+}
+
+.metric-help {
+  font-size: 12px;
+  color: var(--color-graphite-50);
+  margin-top: 4px;
+}
+
+.metric.metric-error { border-left-color: var(--color-error); }
+.metric.metric-warning { border-left-color: var(--color-warning); }
+.metric.metric-success { border-left-color: var(--color-green); }
+
+/* Score circle */
+.score-circle {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin: 0 auto;
+}
+
+.score-circle svg {
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+}
+
+.score-circle .ring-bg { stroke: var(--color-graphite-15); fill: none; stroke-width: 12; }
+.score-circle .ring-fg { stroke: var(--color-emerald); fill: none; stroke-width: 12; stroke-linecap: round; transition: stroke-dasharray 600ms ease; }
+.score-circle.warn .ring-fg { stroke: var(--color-warning); }
+.score-circle.bad .ring-fg { stroke: var(--color-error); }
+
+.score-circle-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.score-value {
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.score-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-graphite-50);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+/* === ISSUES LIST === */
+.issue-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: var(--space-2);
+}
+
+.issue-cat-chip {
+  background: var(--color-white);
+  border: 1px solid var(--color-graphite-15);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-graphite);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.issue-cat-chip:hover { border-color: var(--color-emerald); }
+
+.issue-cat-chip.active {
+  background: var(--color-emerald);
+  border-color: var(--color-emerald);
+  color: white;
+}
+
+.issue-cat-chip .count {
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.issue-cat-chip.active .count { background: rgba(255, 255, 255, 0.25); }
+
+.issue-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.issue {
+  background: var(--color-white);
+  border: 1px solid var(--color-graphite-15);
+  border-left: 4px solid var(--color-graphite-30);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  transition: var(--transition-fast);
+}
+
+.issue:hover { box-shadow: var(--shadow-subtle); }
+
+.issue.severity-critical { border-left-color: var(--color-error); }
+.issue.severity-major { border-left-color: var(--color-warning); }
+.issue.severity-minor { border-left-color: var(--color-cyan); }
+.issue.severity-suggestion { border-left-color: var(--color-emerald); }
+
+.issue-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: 8px;
+}
+
+.issue-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-graphite);
+  margin: 0;
+}
+
+.issue-meta {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.issue-body {
+  font-size: 14px;
+  color: var(--color-graphite);
+  line-height: 1.55;
+}
+
+.issue-quote {
+  background: var(--color-graphite-5);
+  border-left: 3px solid var(--color-graphite-30);
+  padding: 10px 14px;
+  margin: 10px 0;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--color-graphite);
+  border-radius: 4px;
+  word-break: break-word;
+}
+
+.issue-recommendation {
+  background: var(--color-green-5);
+  border-left: 3px solid var(--color-emerald);
+  padding: 10px 14px;
+  margin-top: 10px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.issue-recommendation strong { color: var(--color-emerald-120); display: block; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.issue-legal {
+  display: inline-block;
+  background: var(--color-cyan-5);
+  color: var(--color-blue);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+/* === PROGRESS === */
+.progress-track {
+  background: var(--color-graphite-15);
+  border-radius: 999px;
+  height: 6px;
+  overflow: hidden;
+  margin: var(--space-2) 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-emerald) 0%, var(--color-emerald-50) 100%);
+  border-radius: 999px;
+  transition: width 300ms ease;
+  width: 0%;
+}
+
+.progress-status {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--color-graphite-50);
+}
+
+/* === HIGHLIGHTED TEXT === */
+.text-viewer {
+  background: var(--color-white);
+  border: 1px solid var(--color-graphite-15);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--color-graphite);
+  max-height: 500px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.hl {
+  padding: 1px 3px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  border-bottom: 2px solid;
+}
+
+.hl:hover { filter: brightness(0.95); }
+
+.hl-critical { background: rgba(219, 53, 74, 0.12); border-bottom-color: var(--color-error); }
+.hl-major { background: rgba(250, 176, 59, 0.18); border-bottom-color: var(--color-warning); }
+.hl-minor { background: rgba(0, 165, 196, 0.12); border-bottom-color: var(--color-cyan); }
+.hl-suggestion { background: rgba(0, 160, 114, 0.10); border-bottom-color: var(--color-emerald); }
+
+/* === EMPTY STATES === */
+.empty-state {
+  text-align: center;
+  padding: var(--space-5) var(--space-3);
+  color: var(--color-graphite-50);
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto var(--space-2);
+  background: var(--color-graphite-5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-graphite-30);
+}
+
+.empty-state h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: var(--color-graphite);
+  font-weight: 700;
+}
+
+.empty-state p { margin: 0; font-size: 14px; max-width: 380px; margin-left: auto; margin-right: auto; }
+
+/* === MODAL === */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(46, 54, 65, 0.5);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+}
+
+.modal-backdrop.active {
+  display: flex;
+}
+
+.modal {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  max-width: 720px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-graphite-15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.modal-body {
+  padding: var(--space-3);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--color-graphite-15);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  color: var(--color-graphite-50);
+}
+
+.modal-close:hover { background: var(--color-graphite-5); color: var(--color-graphite); }
+
+/* === TABLES === */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.data-table thead th {
+  background: var(--color-green-15);
+  border-top: 2px solid var(--color-emerald);
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 700;
+  color: var(--color-graphite);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.data-table tbody td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-graphite-15);
+}
+
+.data-table tbody tr:hover { background: var(--color-graphite-5); }
+
+/* === ALERTS === */
+.alert {
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-2);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 14px;
+}
+
+.alert-info { background: var(--color-cyan-5); border: 1px solid rgba(0, 165, 196, 0.2); color: var(--color-blue); }
+.alert-warning { background: var(--color-warning-5); border: 1px solid rgba(250, 176, 59, 0.3); color: #8a5a00; }
+.alert-error { background: var(--color-error-5); border: 1px solid rgba(219, 53, 74, 0.2); color: var(--color-error); }
+.alert-success { background: var(--color-green-5); border: 1px solid rgba(0, 160, 114, 0.2); color: var(--color-emerald-120); }
+
+.alert svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+/* === ICONS === */
+.ico { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ico-lg { width: 24px; height: 24px; }
+.ico-xl { width: 32px; height: 32px; }
+
+/* === SPINNER === */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner-lg { width: 32px; height: 32px; border-width: 3px; }
+
+/* === FOOTER === */
+.app-footer {
+  background: var(--color-white);
+  border-top: 1px solid var(--color-graphite-15);
+  padding: var(--space-2) var(--space-3);
+  font-size: 12px;
+  color: var(--color-graphite-50);
+}
+
+.app-footer-inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+/* === UTILITY === */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.flex { display: flex; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.flex-end { display: flex; justify-content: flex-end; }
+.flex-gap-1 { gap: var(--space-1); }
+.flex-gap-2 { gap: var(--space-2); }
+.mt-1 { margin-top: var(--space-1); }
+.mt-2 { margin-top: var(--space-2); }
+.mt-3 { margin-top: var(--space-3); }
+.mb-1 { margin-bottom: var(--space-1); }
+.mb-2 { margin-bottom: var(--space-2); }
+.mb-3 { margin-bottom: var(--space-3); }
+.hidden { display: none !important; }
+
+/* Print styles for report export */
+@media print {
+  .app-header, .app-tabs, .app-footer, .no-print { display: none !important; }
+  .app-main { padding: 0; }
+  .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+  body { background: white; }
+}
+
+/* === SCROLLBARS === */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--color-graphite-5); }
+::-webkit-scrollbar-thumb { background: var(--color-graphite-30); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-graphite-50); }
+
+/* === DETAILS === */
+details {
+  background: var(--color-graphite-5);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  margin-bottom: 8px;
+}
+
+details summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-graphite);
+  user-select: none;
+}
+
+details[open] summary {
+  margin-bottom: 8px;
+}
+
+/* === CHECKBOX/SWITCH === */
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.switch input { display: none; }
+
+.switch-track {
+  width: 38px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--color-graphite-30);
+  position: relative;
+  transition: var(--transition-fast);
+}
+
+.switch-track::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-white);
+  transition: var(--transition-fast);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.switch input:checked + .switch-track {
+  background: var(--color-emerald);
+}
+
+.switch input:checked + .switch-track::after {
+  transform: translateX(16px);
+}
+
+.switch-label { font-size: 14px; font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="app-header-inner">
+      <div class="brand">
+        <div class="brand-logo">TS</div>
+        <div class="brand-text">
+          <h1>TS Asistentas</h1>
+          <small>Litgrid AB · Pirkimų techninių specifikacijų asistentas</small>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div id="apiStatus" class="header-status">
+          <span class="dot"></span>
+          <span class="label">API neprijungtas</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="App.openSettings()">
+          <svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Nustatymai
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- TABS -->
+  <nav class="app-tabs">
+    <div class="app-tabs-inner">
+      <button class="tab-btn active" data-tab="input">
+        <svg class="tab-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Įvestis
+      </button>
+      <button class="tab-btn" data-tab="metadata">
+        <svg class="tab-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+        Pirkimo kontekstas
+      </button>
+      <button class="tab-btn has-badge" data-tab="analysis" id="tabAnalysis">
+        <svg class="tab-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Analizė
+        <span class="tab-badge" id="analysisBadge">0</span>
+      </button>
+      <button class="tab-btn" data-tab="report">
+        <svg class="tab-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Ataskaita
+      </button>
+      <button class="tab-btn" data-tab="knowledge">
+        <svg class="tab-icon" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        Žinių bazė
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="app-main">
+    <div class="app-main-inner">
+
+      <!-- INPUT TAB -->
+      <section class="tab-panel active" data-panel="input">
+        <div class="hero">
+          <div class="hero-content">
+            <h2>Parenkite <span class="accent">aiškią, teisėtą ir konkurencingą</span> techninę specifikaciją</h2>
+            <p>Įrankis padeda pirkimo iniciatoriams ir organizatoriams rengti technines specifikacijas, atitinkančias PĮ reikalavimus, VPT praktiką ir EPSO-G grupės kokybės standartus. Ieškome neaiškumų, diskriminuojančių sąlygų, prekės ženklų be lygiaverčio, subjektyvių kriterijų ir kitų dažniausių klaidų.</p>
+            <div class="hero-meta">
+              <div class="hero-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                PĮ atitiktis
+              </div>
+              <div class="hero-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                Hibridinė analizė: AI + taisyklės
+              </div>
+              <div class="hero-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Sutaupote 70% analizės laiko
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">
+                <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                1. Įkelkite arba įklijuokite specifikaciją
+              </h2>
+            </div>
+            <p class="card-subtitle">Priimame DOCX, PDF ar tekstą. Galite pridėti ir CVP IS skelbimo nuorodą.</p>
+
+            <div class="card-section">
+              <label class="form-label">DOCX arba PDF failas</label>
+              <div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()">
+                <div class="file-drop-icon">
+                  <svg class="ico-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </div>
+                <p>Vilkite failą čia arba spustelėkite</p>
+                <small>DOCX, DOC, PDF · iki 25 MB</small>
+              </div>
+              <input type="file" id="fileInput" class="file-input" accept=".docx,.doc,.pdf" />
+              <div class="file-list" id="fileList"></div>
+            </div>
+
+            <div class="card-section">
+              <label class="form-label" for="urlInput">CVP IS / pirkimo nuoroda <span class="help">(neprivaloma)</span></label>
+              <div class="flex flex-gap-1">
+                <input type="url" id="urlInput" class="form-input" placeholder="https://cvpp.eviesiejipirkimai.lt/..." />
+                <button class="btn btn-secondary" onclick="App.fetchUrl()">
+                  <svg class="ico" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                  Įkelti
+                </button>
+              </div>
+              <div class="form-help">CORS apribojimai gali neleisti tiesiogiai parsisiųsti turinio iš naršyklės — tokiu atveju nukopijuokite tekstą rankiniu būdu.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">
+                <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+                2. Specifikacijos tekstas
+              </h2>
+            </div>
+            <p class="card-subtitle">Iš įkelto failo automatiškai užpildysime laukelį. Galite redaguoti tekstą prieš analizę.</p>
+            <div class="form-group">
+              <textarea id="specText" class="form-textarea" placeholder="Įklijuokite techninės specifikacijos tekstą čia arba įkelkite DOCX/PDF failą..." oninput="App.updateStats()"></textarea>
+              <div class="flex flex-between mt-1">
+                <div class="form-help" id="textStats">0 simbolių · 0 žodžių · 0 eil.</div>
+                <button class="btn btn-ghost btn-sm" onclick="App.clearText()">
+                  <svg class="ico" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  Išvalyti
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="flex flex-between" style="flex-wrap: wrap; gap: 16px;">
+            <div>
+              <h2 class="card-title">3. Pradėkite analizę</h2>
+              <p class="card-subtitle">Specifikacija bus tikrinama dviem būdais: deterministinės taisyklės + AI (Claude). Nustatymuose galite valdyti analizės gylį.</p>
+            </div>
+            <div class="flex flex-gap-1">
+              <button class="btn btn-secondary" onclick="App.runRulesOnly()">
+                <svg class="ico" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                Greitas patikrinimas (taisyklės)
+              </button>
+              <button class="btn btn-primary btn-lg" id="btnAnalyze" onclick="App.runAnalysis()">
+                <svg class="ico" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Pilnoji analizė (AI + taisyklės)
+              </button>
+            </div>
+          </div>
+          <div id="analysisProgress" class="hidden mt-2">
+            <div class="progress-track"><div class="progress-fill" id="progressBar"></div></div>
+            <div class="progress-status">
+              <span id="progressLabel">Ruošiamasi…</span>
+              <span id="progressPct">0%</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- METADATA TAB -->
+      <section class="tab-panel" data-panel="metadata">
+        <div class="alert alert-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <div>
+            <strong>Kontekstas pagerina analizę.</strong> Užpildžius pirkimo metaduomenis, AI siūlys reikalavimus, atitinkančius pirkimo objekto pobūdį, vertę ir procedūrą bei taikys atitinkamus PĮ straipsnius (pvz., 30, 33–37, 47, 55).
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <h2 class="card-title mb-2">Pirkimo objektas</h2>
+
+            <div class="form-group">
+              <label class="form-label" for="metaTitle">Pirkimo pavadinimas</label>
+              <input type="text" id="metaTitle" class="form-input" placeholder="pvz., 330 kV oro linijos transformatorių pakeitimo paslaugos" />
+            </div>
+
+            <div class="grid grid-2">
+              <div class="form-group">
+                <label class="form-label" for="metaType">Objekto tipas</label>
+                <select id="metaType" class="form-select">
+                  <option value="goods">Prekės</option>
+                  <option value="services">Paslaugos</option>
+                  <option value="works">Darbai</option>
+                  <option value="mixed">Mišrios</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="metaCpv">CPV kodas <span class="help">(jei žinomas)</span></label>
+                <input type="text" id="metaCpv" class="form-input" placeholder="pvz., 71300000-1" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="metaDescription">Trumpas aprašymas / paskirtis</label>
+              <textarea id="metaDescription" class="form-textarea" style="min-height: 100px;" placeholder="Trumpai aprašykite, kam reikalinga įsigyti šį objektą ir koks jo paskirtis Litgrid sistemoje."></textarea>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title mb-2">Procedūra ir vertė</h2>
+
+            <div class="grid grid-2">
+              <div class="form-group">
+                <label class="form-label" for="metaProcedure">Pirkimo būdas</label>
+                <select id="metaProcedure" class="form-select">
+                  <option value="">— Pasirinkite —</option>
+                  <option value="open">Atviras konkursas</option>
+                  <option value="restricted">Ribotas konkursas</option>
+                  <option value="negotiated_with_publication">Skelbiamos derybos</option>
+                  <option value="negotiated_without_publication">Neskelbiamos derybos</option>
+                  <option value="competitive_dialogue">Konkurencinis dialogas</option>
+                  <option value="innovation_partnership">Inovacijų partnerystė</option>
+                  <option value="qualification_system">Kvalifikacijos sistema</option>
+                  <option value="small_value">Mažos vertės pirkimas</option>
+                  <option value="framework">Preliminari sutartis</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="metaValue">Numatoma vertė (EUR be PVM)</label>
+                <input type="number" id="metaValue" class="form-input" placeholder="0" min="0" step="1000" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="metaCriteria">Pasiūlymų vertinimo kriterijus</label>
+              <select id="metaCriteria" class="form-select">
+                <option value="">— Pasirinkite —</option>
+                <option value="price">Mažiausia kaina</option>
+                <option value="cost">Sąnaudos (gyvavimo ciklas)</option>
+                <option value="best_price_quality">Ekonomiškai naudingiausias (kaina/kokybė)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Specialūs aspektai</label>
+              <div style="display: grid; gap: 8px;">
+                <label class="switch"><input type="checkbox" id="metaInternational"><span class="switch-track"></span><span class="switch-label">Tarptautinė vertė (viršija ES ribą)</span></label>
+                <label class="switch"><input type="checkbox" id="metaGreen"><span class="switch-track"></span><span class="switch-label">Žaliasis pirkimas / aplinkosauga</span></label>
+                <label class="switch"><input type="checkbox" id="metaInnovation"><span class="switch-track"></span><span class="switch-label">Inovacijų aspektas</span></label>
+                <label class="switch"><input type="checkbox" id="metaCritical"><span class="switch-track"></span><span class="switch-label">Kritinė infrastruktūra / saugumas</span></label>
+                <label class="switch"><input type="checkbox" id="metaParts"><span class="switch-track"></span><span class="switch-label">Skaidoma į dalis</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <h2 class="card-title mb-2">Litgrid kontekstas</h2>
+          <p class="card-subtitle">Šios prielaidos automatiškai naudojamos analizėje:</p>
+          <table class="data-table mt-2">
+            <thead>
+              <tr><th>Aspektas</th><th>Reikšmė</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Perkančiojo subjekto statusas</td><td>Perkantysis subjektas (energetikos sektorius) <span class="badge badge-info">PĮ</span></td></tr>
+              <tr><td>Reglamentas</td><td>LR Pirkimų, atliekamų vandentvarkos, energetikos, transporto ar pašto paslaugų srities perkančiųjų subjektų įstatymas</td></tr>
+              <tr><td>Direktyva</td><td>2014/25/ES (Sektorinė)</td></tr>
+              <tr><td>Sektorius</td><td>Elektros perdavimas (TSO)</td></tr>
+              <tr><td>Pagrindinė priežiūros institucija</td><td>Viešųjų pirkimų tarnyba (VPT)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ANALYSIS TAB -->
+      <section class="tab-panel" data-panel="analysis">
+        <div id="analysisEmpty">
+          <div class="card">
+            <div class="empty-state">
+              <div class="empty-state-icon">
+                <svg class="ico-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </div>
+              <h3>Analizė dar neatlikta</h3>
+              <p>Įkelkite specifikaciją ir paspauskite „Pilnoji analizė" pirmoje kortelėje, kad pamatytumėte rezultatus čia.</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="analysisResults" class="hidden">
+          <!-- Score & summary -->
+          <div class="grid grid-sidebar mb-3">
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">
+                  <svg class="title-icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                  Analizės santrauka
+                </h2>
+                <button class="btn btn-secondary btn-sm" onclick="App.runAnalysis()">
+                  <svg class="ico" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                  Pakartoti
+                </button>
+              </div>
+              <p id="analysisSummary" class="card-subtitle"></p>
+              <div class="metric-grid mt-2">
+                <div class="metric metric-error" id="metricCritical">
+                  <div class="metric-label">Kritinės klaidos</div>
+                  <div class="metric-value">0</div>
+                  <div class="metric-help">Privalu šalinti</div>
+                </div>
+                <div class="metric metric-warning" id="metricMajor">
+                  <div class="metric-label">Reikšmingos</div>
+                  <div class="metric-value">0</div>
+                  <div class="metric-help">Stipriai rekomenduojama</div>
+                </div>
+                <div class="metric" id="metricMinor">
+                  <div class="metric-label">Mažesnės</div>
+                  <div class="metric-value">0</div>
+                  <div class="metric-help">Tobulinimo galimybės</div>
+                </div>
+                <div class="metric metric-success" id="metricSuggestion">
+                  <div class="metric-label">Pasiūlymai</div>
+                  <div class="metric-value">0</div>
+                  <div class="metric-help">Geroji praktika</div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <h2 class="card-title mb-2">Bendras vertinimas</h2>
+              <div class="score-circle" id="scoreCircle">
+                <svg viewBox="0 0 120 120">
+                  <circle class="ring-bg" cx="60" cy="60" r="50"/>
+                  <circle class="ring-fg" cx="60" cy="60" r="50" stroke-dasharray="0 314"/>
+                </svg>
+                <div class="score-circle-content">
+                  <div class="score-value" id="scoreValue">—</div>
+                  <div class="score-label">iš 100</div>
+                </div>
+              </div>
+              <div class="text-center mt-2">
+                <div id="scoreVerdict" class="badge badge-neutral">Vertinimas</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filters & issues -->
+          <div class="grid grid-sidebar">
+            <div>
+              <div class="card mb-2">
+                <h2 class="card-title mb-2">Filtruoti pagal kategoriją</h2>
+                <div class="issue-categories" id="issueCategories"></div>
+              </div>
+              <div id="issuesList" class="issue-list"></div>
+            </div>
+
+            <div>
+              <div class="card">
+                <h2 class="card-title mb-2">
+                  <svg class="title-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                  Pagal sritį
+                </h2>
+                <div id="categoryStats"></div>
+              </div>
+
+              <div class="card mt-2">
+                <h2 class="card-title mb-2">
+                  <svg class="title-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  Stiprybės
+                </h2>
+                <ul id="strengthsList" class="card-subtitle" style="padding-left: 18px; margin: 0;"></ul>
+              </div>
+
+              <div class="card mt-2">
+                <h2 class="card-title mb-2">Veiksmų planas</h2>
+                <ol id="actionPlan" class="card-subtitle" style="padding-left: 18px; margin: 0;"></ol>
+              </div>
+            </div>
+          </div>
+
+          <!-- Highlighted text -->
+          <div class="card mt-3">
+            <div class="card-header">
+              <h2 class="card-title">
+                <svg class="title-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                Specifikacijos tekstas su anotacijomis
+              </h2>
+              <div class="flex flex-gap-1">
+                <span class="badge badge-error">Kritinės</span>
+                <span class="badge badge-warning">Reikšmingos</span>
+                <span class="badge badge-info">Mažesnės</span>
+                <span class="badge badge-success">Pasiūlymai</span>
+              </div>
+            </div>
+            <div class="text-viewer" id="annotatedText"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- REPORT TAB -->
+      <section class="tab-panel" data-panel="report">
+        <div id="reportEmpty" class="card">
+          <div class="empty-state">
+            <div class="empty-state-icon">
+              <svg class="ico-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <h3>Ataskaitos dar nėra</h3>
+            <p>Atlikite analizę, kad sugeneruotumėte profesionalią ataskaitą su pirkimų komisijai pateikiamais duomenimis.</p>
+          </div>
+        </div>
+
+        <div id="reportContent" class="hidden">
+          <div class="card no-print mb-3">
+            <div class="flex flex-between" style="flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 class="card-title">Eksportuokite ataskaitą</h2>
+                <p class="card-subtitle">Pasirinkite formatą, tinkamą pirkimų komisijai, vidiniam derinimui arba auditui.</p>
+              </div>
+              <div class="flex flex-gap-1">
+                <button class="btn btn-secondary" onclick="App.exportHtml()">
+                  <svg class="ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  HTML
+                </button>
+                <button class="btn btn-secondary" onclick="App.exportDocx()">
+                  <svg class="ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  DOCX
+                </button>
+                <button class="btn btn-primary" onclick="window.print()">
+                  <svg class="ico" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                  Spausdinti / PDF
+                </button>
+              </div>
+            </div>
+          </div>
+          <div id="reportBody"></div>
+        </div>
+      </section>
+
+      <!-- KNOWLEDGE TAB -->
+      <section class="tab-panel" data-panel="knowledge">
+        <div class="card">
+          <h2 class="card-title mb-2">Žinių bazė: dažniausios technikos specifikacijos klaidos</h2>
+          <p class="card-subtitle">Šis sąrašas remiasi VPT praktika, ESFA leidiniu „Dažniausios projektų viešųjų pirkimų klaidos" ir LAT praktika. Įrankis taisyklių variklyje aktyviai ieško kiekvieno punkto.</p>
+
+          <div class="mt-3" id="knowledgeBase"></div>
+        </div>
+
+        <div class="card mt-3">
+          <h2 class="card-title mb-2">Kaip skaityti rezultatus</h2>
+          <table class="data-table">
+            <thead><tr><th>Sunkumas</th><th>Reikšmė</th><th>Veiksmas</th></tr></thead>
+            <tbody>
+              <tr><td><span class="badge badge-error">Kritinė</span></td><td>Tiesioginis PĮ pažeidimas, gali baigtis pirkimo nutraukimu ar VPT sankcija</td><td>Privaloma pataisyti prieš skelbiant</td></tr>
+              <tr><td><span class="badge badge-warning">Reikšminga</span></td><td>Aukšta diskriminacijos, ginčytinumo ar neaiškumo rizika</td><td>Stipriai rekomenduojama pataisyti</td></tr>
+              <tr><td><span class="badge badge-info">Mažesnė</span></td><td>Stiliaus, formuluotės, struktūros tobulinimo galimybė</td><td>Rekomenduojama, neprivaloma</td></tr>
+              <tr><td><span class="badge badge-success">Pasiūlymas</span></td><td>Praktinis patobulinimas, gerinantis konkurenciją ar aiškumą</td><td>Apsvarstyti</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <div class="app-footer-inner">
+      <div>TS Asistentas v1.0 · Litgrid AB · Skirta vidiniam pirkimų komandos darbui.</div>
+      <div>
+        <a href="https://www.vpt.lt" target="_blank" rel="noopener">VPT</a> ·
+        <a href="https://www.litgrid.eu" target="_blank" rel="noopener">Litgrid.eu</a> ·
+        <a href="#" onclick="App.openSettings(); return false;">API nustatymai</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-backdrop" id="settingsModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Nustatymai</h3>
+      <button class="modal-close" onclick="App.closeSettings()">
+        <svg class="ico" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-info">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <div>API raktas saugomas tik jūsų naršyklėje (localStorage) ir niekada nesiunčiamas niekur, išskyrus tiesiai į Anthropic API. Jeigu jūsų organizacijoje veikia korporatyvinis Claude proxy, įveskite jo URL žemiau.</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="apiKey">Anthropic API raktas <span class="req">*</span></label>
+        <input type="password" id="apiKey" class="form-input" placeholder="sk-ant-..." />
+        <div class="form-help">Gauti raktą: <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="apiEndpoint">API galinis taškas <span class="help">(jei naudojamas korporatyvinis proxy)</span></label>
+        <input type="url" id="apiEndpoint" class="form-input" placeholder="https://api.anthropic.com/v1/messages" />
+      </div>
+
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label class="form-label" for="modelSelect">Modelis</label>
+          <select id="modelSelect" class="form-select">
+            <option value="claude-opus-4-6">Claude Opus 4.6 (galingiausias)</option>
+            <option value="claude-sonnet-4-6" selected>Claude Sonnet 4.6 (rekomenduojamas)</option>
+            <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (greičiausias)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="depthSelect">Analizės gylis</label>
+          <select id="depthSelect" class="form-select">
+            <option value="quick">Greita (santraukai)</option>
+            <option value="standard" selected>Standartinė (rekomenduojama)</option>
+            <option value="deep">Gili (visa analizė)</option>
+          </select>
+        </div>
+      </div>
+
+      <details class="mt-2">
+        <summary>Papildomos analizės kryptys</summary>
+        <div class="mt-2" style="display: grid; gap: 8px;">
+          <label class="switch"><input type="checkbox" id="optGrammar" checked><span class="switch-track"></span><span class="switch-label">Gramatika ir rašyba</span></label>
+          <label class="switch"><input type="checkbox" id="optClarity" checked><span class="switch-track"></span><span class="switch-label">Aiškumas ir nedviprasmiškumas</span></label>
+          <label class="switch"><input type="checkbox" id="optLegal" checked><span class="switch-track"></span><span class="switch-label">PĮ atitiktis ir teisinė rizika</span></label>
+          <label class="switch"><input type="checkbox" id="optCompetition" checked><span class="switch-track"></span><span class="switch-label">Konkurencijos ribojimo analizė</span></label>
+          <label class="switch"><input type="checkbox" id="optMarket" checked><span class="switch-track"></span><span class="switch-label">Rinkos / techninių sprendimų pasiūlymai</span></label>
+          <label class="switch"><input type="checkbox" id="optGreen"><span class="switch-track"></span><span class="switch-label">Žaliųjų pirkimų aspektai</span></label>
+          <label class="switch"><input type="checkbox" id="optAccessibility"><span class="switch-track"></span><span class="switch-label">Prieinamumo reikalavimai</span></label>
+        </div>
+      </details>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="App.closeSettings()">Uždaryti</button>
+      <button class="btn btn-primary" onclick="App.saveSettings()">Išsaugoti</button>
+    </div>
+  </div>
+</div>
+
+<!-- ISSUE DETAIL MODAL -->
+<div class="modal-backdrop" id="issueModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="issueModalTitle">Pastaba</h3>
+      <button class="modal-close" onclick="App.closeIssueModal()">
+        <svg class="ico" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="issueModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="App.closeIssueModal()">Uždaryti</button>
+    </div>
+  </div>
+</div>
+
+<!-- External libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+</script>
+
+<script>
+// === APPLICATION LOGIC ===
+// Will be loaded as separate module below
+</script>
+
+<script>
+/* ============================================================
+   TS ASISTENTAS — Pagrindinė logika
+   Litgrid AB · Pirkimų techninių specifikacijų asistentas
+   ============================================================ */
+
+const App = (() => {
+  // --- STATE ---
+  const state = {
+    spec: '',
+    fileName: null,
+    metadata: {},
+    settings: loadSettings(),
+    analysis: null,
+    rulesResult: null,
+    activeFilter: 'all',
+  };
+
+  function loadSettings() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('ts_asistentas_settings') || '{}');
+      return Object.assign({
+        apiKey: '',
+        apiEndpoint: 'https://api.anthropic.com/v1/messages',
+        model: 'claude-sonnet-4-6',
+        depth: 'standard',
+        options: {
+          grammar: true,
+          clarity: true,
+          legal: true,
+          competition: true,
+          market: true,
+          green: false,
+          accessibility: false,
+        }
+      }, saved);
+    } catch { return {}; }
+  }
+
+  function saveSettings() {
+    state.settings.apiKey = $('#apiKey').value.trim();
+    state.settings.apiEndpoint = $('#apiEndpoint').value.trim() || 'https://api.anthropic.com/v1/messages';
+    state.settings.model = $('#modelSelect').value;
+    state.settings.depth = $('#depthSelect').value;
+    state.settings.options = {
+      grammar: $('#optGrammar').checked,
+      clarity: $('#optClarity').checked,
+      legal: $('#optLegal').checked,
+      competition: $('#optCompetition').checked,
+      market: $('#optMarket').checked,
+      green: $('#optGreen').checked,
+      accessibility: $('#optAccessibility').checked,
+    };
+    localStorage.setItem('ts_asistentas_settings', JSON.stringify(state.settings));
+    updateApiStatus();
+    closeSettings();
+    toast('Nustatymai išsaugoti.', 'success');
+  }
+
+  // --- HELPERS ---
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+  function escapeHtml(s) {
+    return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function toast(msg, type = 'info') {
+    // Lightweight toast
+    const div = document.createElement('div');
+    div.style.cssText = `position:fixed;top:80px;right:24px;z-index:200;padding:12px 20px;border-radius:8px;font-weight:600;font-size:14px;color:white;box-shadow:0 8px 24px rgba(0,0,0,0.2);transition:opacity 200ms;`;
+    div.style.background = type === 'success' ? 'var(--color-emerald)' : type === 'error' ? 'var(--color-error)' : 'var(--color-graphite)';
+    div.textContent = msg;
+    document.body.appendChild(div);
+    setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 200); }, 2800);
+  }
+
+  function setProgress(pct, label) {
+    $('#progressBar').style.width = pct + '%';
+    $('#progressPct').textContent = Math.round(pct) + '%';
+    if (label) $('#progressLabel').textContent = label;
+  }
+
+  function showProgress() { $('#analysisProgress').classList.remove('hidden'); }
+  function hideProgress() { setTimeout(() => $('#analysisProgress').classList.add('hidden'), 600); }
+
+  function updateApiStatus() {
+    const el = $('#apiStatus');
+    if (state.settings.apiKey) {
+      el.classList.add('connected');
+      el.classList.remove('error');
+      el.querySelector('.label').textContent = `API prijungtas · ${state.settings.model.replace('claude-', '').split('-').slice(0,2).join(' ')}`;
+    } else {
+      el.classList.remove('connected', 'error');
+      el.querySelector('.label').textContent = 'API neprijungtas';
+    }
+  }
+
+  // --- TABS ---
+  function switchTab(name) {
+    $$('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+    $$('.tab-panel').forEach(p => p.classList.toggle('active', p.dataset.panel === name));
+  }
+
+  function init() {
+    // Tabs
+    $$('.tab-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+
+    // Apply settings to UI
+    $('#apiKey').value = state.settings.apiKey || '';
+    $('#apiEndpoint').value = state.settings.apiEndpoint || '';
+    $('#modelSelect').value = state.settings.model || 'claude-sonnet-4-6';
+    $('#depthSelect').value = state.settings.depth || 'standard';
+    Object.entries(state.settings.options || {}).forEach(([k, v]) => {
+      const el = $('#opt' + k.charAt(0).toUpperCase() + k.slice(1));
+      if (el) el.checked = v;
+    });
+
+    // File handling
+    setupFileHandling();
+
+    // Knowledge base
+    renderKnowledgeBase();
+
+    updateApiStatus();
+    updateStats();
+  }
+
+  // --- FILE HANDLING ---
+  function setupFileHandling() {
+    const drop = $('#fileDrop');
+    const input = $('#fileInput');
+
+    input.addEventListener('change', (e) => {
+      const f = e.target.files[0];
+      if (f) handleFile(f);
+    });
+
+    ['dragenter', 'dragover'].forEach(ev => {
+      drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('dragover'); });
+    });
+    ['dragleave', 'drop'].forEach(ev => {
+      drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('dragover'); });
+    });
+    drop.addEventListener('drop', (e) => {
+      const f = e.dataTransfer.files[0];
+      if (f) handleFile(f);
+    });
+  }
+
+  async function handleFile(file) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    showFileItem(file.name, file.size, true);
+    try {
+      let text = '';
+      if (ext === 'docx' || ext === 'doc') {
+        const buf = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer: buf });
+        text = result.value;
+      } else if (ext === 'pdf') {
+        text = await extractPdfText(file);
+      } else {
+        text = await file.text();
+      }
+      $('#specText').value = text;
+      state.fileName = file.name;
+      state.spec = text;
+      updateStats();
+      showFileItem(file.name, file.size, false);
+      toast(`Įkelta: ${file.name} (${formatBytes(file.size)})`, 'success');
+    } catch (err) {
+      console.error(err);
+      toast('Klaida skaitant failą: ' + err.message, 'error');
+      showFileItem(file.name, file.size, false, true);
+    }
+  }
+
+  async function extractPdfText(file) {
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+    let txt = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const c = await page.getTextContent();
+      txt += c.items.map(x => x.str).join(' ') + '\n\n';
+    }
+    return txt;
+  }
+
+  function showFileItem(name, size, loading, error) {
+    const list = $('#fileList');
+    list.innerHTML = `
+      <div class="file-item">
+        <div class="file-item-icon">
+          ${loading ? '<span class="spinner"></span>' : error ? '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' : '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'}
+        </div>
+        <div class="file-item-info">
+          <div class="file-item-name">${escapeHtml(name)}</div>
+          <div class="file-item-meta">${formatBytes(size)} · ${loading ? 'Skaitoma...' : error ? 'Klaida' : 'Įkelta'}</div>
+        </div>
+        <button class="file-item-remove" onclick="App.removeFile()">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>`;
+  }
+
+  function removeFile() {
+    $('#fileList').innerHTML = '';
+    $('#fileInput').value = '';
+    state.fileName = null;
+  }
+
+  function formatBytes(b) {
+    if (b < 1024) return b + ' B';
+    if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+    return (b / 1024 / 1024).toFixed(1) + ' MB';
+  }
+
+  async function fetchUrl() {
+    const url = $('#urlInput').value.trim();
+    if (!url) { toast('Įveskite nuorodą.', 'error'); return; }
+    toast('Bandoma parsisiųsti...', 'info');
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const html = await res.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      doc.querySelectorAll('script,style,nav,header,footer').forEach(n => n.remove());
+      const txt = doc.body.innerText.replace(/\s+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+      $('#specText').value = txt;
+      updateStats();
+      toast('Tekstas įkeltas.', 'success');
+    } catch (err) {
+      toast('Nepavyko parsiųsti (CORS?). Nukopijuokite tekstą rankiniu būdu.', 'error');
+    }
+  }
+
+  // --- TEXT STATS ---
+  function updateStats() {
+    const txt = $('#specText').value;
+    state.spec = txt;
+    const chars = txt.length;
+    const words = (txt.trim().match(/\S+/g) || []).length;
+    const lines = txt.split('\n').length;
+    $('#textStats').textContent = `${chars.toLocaleString('lt-LT')} simb. · ${words.toLocaleString('lt-LT')} žodž. · ${lines.toLocaleString('lt-LT')} eil.`;
+  }
+
+  function clearText() {
+    $('#specText').value = '';
+    state.spec = '';
+    updateStats();
+  }
+
+  // --- METADATA ---
+  function gatherMetadata() {
+    return {
+      title: $('#metaTitle').value.trim(),
+      type: $('#metaType').value,
+      cpv: $('#metaCpv').value.trim(),
+      description: $('#metaDescription').value.trim(),
+      procedure: $('#metaProcedure').value,
+      value: parseFloat($('#metaValue').value) || null,
+      criteria: $('#metaCriteria').value,
+      flags: {
+        international: $('#metaInternational').checked,
+        green: $('#metaGreen').checked,
+        innovation: $('#metaInnovation').checked,
+        critical: $('#metaCritical').checked,
+        parts: $('#metaParts').checked,
+      }
+    };
+  }
+
+  // --- SETTINGS MODAL ---
+  function openSettings() { $('#settingsModal').classList.add('active'); }
+  function closeSettings() { $('#settingsModal').classList.remove('active'); }
+
+  // --- ANALYSIS ENTRY POINTS ---
+  async function runRulesOnly() {
+    if (!ensureSpec()) return;
+    showProgress();
+    setProgress(20, 'Vykdomos taisyklės...');
+    const rules = RuleEngine.run(state.spec, gatherMetadata());
+    setProgress(100, 'Atlikta');
+    state.rulesResult = rules;
+    state.analysis = composeAnalysis(rules.issues, [], 'rules-only');
+    renderAnalysis();
+    switchTab('analysis');
+    hideProgress();
+    toast(`Taisyklės: rasta ${rules.issues.length} pastabų.`, 'success');
+  }
+
+  async function runAnalysis() {
+    if (!ensureSpec()) return;
+    if (!state.settings.apiKey) {
+      toast('Nenustatytas API raktas. Atidarau nustatymus.', 'error');
+      openSettings();
+      return;
+    }
+    showProgress();
+    try {
+      setProgress(10, 'Vykdomos taisyklės...');
+      const rules = RuleEngine.run(state.spec, gatherMetadata());
+      state.rulesResult = rules;
+
+      setProgress(30, 'Siunčiama Claude API...');
+      const aiResult = await AIAnalyzer.analyze(state.spec, gatherMetadata(), rules, state.settings, (label, pct) => {
+        setProgress(30 + pct * 0.6, label);
+      });
+
+      setProgress(95, 'Sudaroma ataskaita...');
+      state.analysis = composeAnalysis(rules.issues, aiResult.issues, 'hybrid', aiResult);
+      setProgress(100, 'Atlikta');
+      renderAnalysis();
+      renderReport();
+      switchTab('analysis');
+      toast(`Analizė baigta. Rasta ${state.analysis.issues.length} pastabų.`, 'success');
+    } catch (err) {
+      console.error(err);
+      toast('Klaida: ' + err.message, 'error');
+      setProgress(0, 'Klaida');
+    }
+    hideProgress();
+  }
+
+  function ensureSpec() {
+    const t = $('#specText').value.trim();
+    if (t.length < 50) {
+      toast('Specifikacijos tekstas per trumpas (min. 50 simbolių).', 'error');
+      return false;
+    }
+    state.spec = t;
+    return true;
+  }
+
+  function composeAnalysis(ruleIssues, aiIssues, mode, aiMeta) {
+    // Merge & dedupe
+    const all = [...ruleIssues, ...aiIssues];
+    // Score
+    const weights = { critical: 12, major: 6, minor: 2, suggestion: 0 };
+    const penalty = all.reduce((s, i) => s + (weights[i.severity] || 0), 0);
+    const score = Math.max(0, 100 - penalty);
+    return {
+      issues: all,
+      score,
+      mode,
+      summary: aiMeta?.summary || generateRulesSummary(all, score),
+      strengths: aiMeta?.strengths || [],
+      actionPlan: aiMeta?.actionPlan || generateActionPlan(all),
+      timestamp: new Date().toISOString(),
+      metadata: gatherMetadata(),
+    };
+  }
+
+  function generateRulesSummary(issues, score) {
+    const c = issues.filter(i => i.severity === 'critical').length;
+    const m = issues.filter(i => i.severity === 'major').length;
+    if (c > 0) return `Aptiktos ${c} kritinės klaidos, kurios gali pažeisti PĮ reikalavimus. Rekomenduojame jas pašalinti prieš skelbiant pirkimą.`;
+    if (m > 0) return `Aptiktos ${m} reikšmingos pastabos. Specifikacija dažniausiai atitinka reikalavimus, bet gali būti tobulinama.`;
+    return `Nerasta esminių pažeidimų. Specifikacijoje esama ${issues.length} smulkesnių tobulinimo galimybių.`;
+  }
+
+  function generateActionPlan(issues) {
+    const plan = [];
+    const byCat = {};
+    issues.filter(i => i.severity === 'critical' || i.severity === 'major').forEach(i => {
+      byCat[i.category] = (byCat[i.category] || 0) + 1;
+    });
+    Object.entries(byCat).slice(0, 5).forEach(([cat, n]) => {
+      plan.push(`Peržiūrėti ir pataisyti „${CATEGORIES[cat]?.label || cat}" pastabas (${n}).`);
+    });
+    if (!plan.length) plan.push('Specifikacija parengta tinkamai – tikslinti pagal mažesnio prioriteto pastabas.');
+    return plan;
+  }
+
+  // --- RENDER ANALYSIS ---
+  function renderAnalysis() {
+    if (!state.analysis) return;
+    $('#analysisEmpty').classList.add('hidden');
+    $('#analysisResults').classList.remove('hidden');
+
+    const a = state.analysis;
+    $('#analysisSummary').textContent = a.summary;
+
+    const sev = { critical: 0, major: 0, minor: 0, suggestion: 0 };
+    a.issues.forEach(i => sev[i.severity] = (sev[i.severity] || 0) + 1);
+    $('#metricCritical').querySelector('.metric-value').textContent = sev.critical;
+    $('#metricMajor').querySelector('.metric-value').textContent = sev.major;
+    $('#metricMinor').querySelector('.metric-value').textContent = sev.minor;
+    $('#metricSuggestion').querySelector('.metric-value').textContent = sev.suggestion;
+
+    // Score circle
+    const score = a.score;
+    const circle = $('#scoreCircle');
+    circle.classList.remove('warn', 'bad');
+    if (score < 50) circle.classList.add('bad');
+    else if (score < 75) circle.classList.add('warn');
+    const ring = circle.querySelector('.ring-fg');
+    const circ = 2 * Math.PI * 50;
+    ring.setAttribute('stroke-dasharray', `${(score / 100) * circ} ${circ}`);
+    $('#scoreValue').textContent = score;
+    const verdict = $('#scoreVerdict');
+    verdict.className = 'badge ' + (score >= 85 ? 'badge-success' : score >= 65 ? 'badge-info' : score >= 45 ? 'badge-warning' : 'badge-error');
+    verdict.textContent = score >= 85 ? 'Puiki specifikacija' : score >= 65 ? 'Tinka po patikslinimų' : score >= 45 ? 'Reikia pataisymų' : 'Reikšmingai tobulinti';
+
+    // Tab badge
+    $('#tabAnalysis').classList.toggle('has-badge', a.issues.length > 0);
+    $('#analysisBadge').textContent = a.issues.length;
+
+    // Categories
+    renderCategoryFilters(a.issues);
+    renderIssuesList(a.issues);
+    renderCategoryStats(a.issues);
+    renderStrengths(a.strengths);
+    renderActionPlan(a.actionPlan);
+    renderAnnotatedText();
+  }
+
+  function renderCategoryFilters(issues) {
+    const cats = {};
+    issues.forEach(i => cats[i.category] = (cats[i.category] || 0) + 1);
+    const all = `<button class="issue-cat-chip ${state.activeFilter === 'all' ? 'active' : ''}" onclick="App.filterCategory('all')">Visos <span class="count">${issues.length}</span></button>`;
+    const html = Object.entries(cats).map(([k, n]) => {
+      const lbl = CATEGORIES[k]?.label || k;
+      const active = state.activeFilter === k ? 'active' : '';
+      return `<button class="issue-cat-chip ${active}" onclick="App.filterCategory('${k}')">${escapeHtml(lbl)} <span class="count">${n}</span></button>`;
+    }).join('');
+    $('#issueCategories').innerHTML = all + html;
+  }
+
+  function filterCategory(k) {
+    state.activeFilter = k;
+    renderCategoryFilters(state.analysis.issues);
+    renderIssuesList(state.analysis.issues);
+  }
+
+  function renderIssuesList(issues) {
+    const filtered = state.activeFilter === 'all' ? issues : issues.filter(i => i.category === state.activeFilter);
+    if (!filtered.length) {
+      $('#issuesList').innerHTML = `<div class="card"><div class="empty-state"><h3>Šioje kategorijoje pastabų nėra</h3><p>Spustelėkite „Visos", kad pamatytumėte visus rezultatus.</p></div></div>`;
+      return;
+    }
+    const order = { critical: 0, major: 1, minor: 2, suggestion: 3 };
+    filtered.sort((a, b) => order[a.severity] - order[b.severity]);
+    $('#issuesList').innerHTML = filtered.map((i, idx) => renderIssue(i, idx)).join('');
+  }
+
+  function renderIssue(i, idx) {
+    const sevLbl = { critical: 'Kritinė', major: 'Reikšminga', minor: 'Mažesnė', suggestion: 'Pasiūlymas' };
+    const sevBadge = { critical: 'badge-error', major: 'badge-warning', minor: 'badge-info', suggestion: 'badge-success' };
+    const catLbl = CATEGORIES[i.category]?.label || i.category;
+    return `
+      <div class="issue severity-${i.severity}" onclick="App.showIssueDetail(${idx})">
+        <div class="issue-header">
+          <h4 class="issue-title">${escapeHtml(i.title)}</h4>
+          <div class="issue-meta">
+            <span class="badge ${sevBadge[i.severity]}">${sevLbl[i.severity]}</span>
+            <span class="badge badge-neutral">${escapeHtml(catLbl)}</span>
+            ${i.source === 'rule' ? '<span class="badge badge-neutral">Taisyklė</span>' : '<span class="badge badge-info">AI</span>'}
+          </div>
+        </div>
+        <div class="issue-body">
+          ${escapeHtml(i.description || '')}
+          ${i.quote ? `<div class="issue-quote">"${escapeHtml(i.quote.slice(0, 280))}${i.quote.length > 280 ? '…' : ''}"</div>` : ''}
+          ${i.recommendation ? `<div class="issue-recommendation"><strong>Rekomendacija</strong>${escapeHtml(i.recommendation)}</div>` : ''}
+          ${i.legalRef ? `<span class="issue-legal">📜 ${escapeHtml(i.legalRef)}</span>` : ''}
+        </div>
+      </div>`;
+  }
+
+  function showIssueDetail(idx) {
+    const filtered = state.activeFilter === 'all' ? state.analysis.issues : state.analysis.issues.filter(i => i.category === state.activeFilter);
+    const order = { critical: 0, major: 1, minor: 2, suggestion: 3 };
+    filtered.sort((a, b) => order[a.severity] - order[b.severity]);
+    const i = filtered[idx];
+    if (!i) return;
+    const sevLbl = { critical: 'Kritinė', major: 'Reikšminga', minor: 'Mažesnė', suggestion: 'Pasiūlymas' };
+    $('#issueModalTitle').textContent = i.title;
+    $('#issueModalBody').innerHTML = `
+      <div class="flex flex-gap-1 mb-2">
+        <span class="badge badge-${i.severity === 'critical' ? 'error' : i.severity === 'major' ? 'warning' : i.severity === 'minor' ? 'info' : 'success'}">${sevLbl[i.severity]}</span>
+        <span class="badge badge-neutral">${escapeHtml(CATEGORIES[i.category]?.label || i.category)}</span>
+      </div>
+      <p>${escapeHtml(i.description || '')}</p>
+      ${i.quote ? `<div class="issue-quote">${escapeHtml(i.quote)}</div>` : ''}
+      ${i.recommendation ? `<div class="issue-recommendation"><strong>Rekomendacija</strong>${escapeHtml(i.recommendation)}</div>` : ''}
+      ${i.alternative ? `<div class="alert alert-success mt-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><div><strong>Alternatyvus formulavimas:</strong><br/>${escapeHtml(i.alternative)}</div></div>` : ''}
+      ${i.legalRef ? `<p class="mt-2"><span class="issue-legal">📜 Teisinis pagrindas: ${escapeHtml(i.legalRef)}</span></p>` : ''}
+    `;
+    $('#issueModal').classList.add('active');
+  }
+  function closeIssueModal() { $('#issueModal').classList.remove('active'); }
+
+  function renderCategoryStats(issues) {
+    const cats = {};
+    issues.forEach(i => {
+      const k = i.category;
+      if (!cats[k]) cats[k] = { count: 0, critical: 0, major: 0 };
+      cats[k].count++;
+      if (i.severity === 'critical') cats[k].critical++;
+      if (i.severity === 'major') cats[k].major++;
+    });
+    const html = Object.entries(cats).sort((a, b) => b[1].count - a[1].count).map(([k, v]) => {
+      const lbl = CATEGORIES[k]?.label || k;
+      const max = Math.max(...Object.values(cats).map(c => c.count));
+      const pct = (v.count / max) * 100;
+      return `
+        <div style="margin-bottom: 12px;">
+          <div class="flex flex-between" style="margin-bottom: 4px;">
+            <span style="font-size: 13px; font-weight: 600;">${escapeHtml(lbl)}</span>
+            <span style="font-size: 13px; color: var(--color-graphite-50);">${v.count}</span>
+          </div>
+          <div style="height: 6px; background: var(--color-graphite-15); border-radius: 999px; overflow: hidden;">
+            <div style="height: 100%; width: ${pct}%; background: var(--color-emerald); border-radius: 999px;"></div>
+          </div>
+        </div>`;
+    }).join('');
+    $('#categoryStats').innerHTML = html || '<p class="card-subtitle">Nėra pastabų.</p>';
+  }
+
+  function renderStrengths(strengths) {
+    if (!strengths || !strengths.length) {
+      $('#strengthsList').innerHTML = '<li>Atlikus AI analizę, čia bus išvardintos specifikacijos stiprybės.</li>';
+      return;
+    }
+    $('#strengthsList').innerHTML = strengths.map(s => `<li>${escapeHtml(s)}</li>`).join('');
+  }
+
+  function renderActionPlan(plan) {
+    $('#actionPlan').innerHTML = (plan || []).map(p => `<li>${escapeHtml(p)}</li>`).join('');
+  }
+
+  function renderAnnotatedText() {
+    const text = state.spec;
+    const issues = state.analysis.issues.filter(i => i.quote);
+
+    // Build position map
+    const matches = [];
+    issues.forEach((i, idx) => {
+      if (!i.quote) return;
+      const q = i.quote.trim();
+      const pos = text.toLowerCase().indexOf(q.toLowerCase());
+      if (pos >= 0) {
+        matches.push({ start: pos, end: pos + q.length, severity: i.severity, idx, title: i.title });
+      }
+    });
+    matches.sort((a, b) => a.start - b.start);
+
+    let html = '';
+    let cursor = 0;
+    matches.forEach(m => {
+      if (m.start < cursor) return; // Skip overlapping
+      html += escapeHtml(text.slice(cursor, m.start));
+      const slice = text.slice(m.start, m.end);
+      html += `<span class="hl hl-${m.severity}" title="${escapeHtml(m.title)}" onclick="App.showIssueDetail(${m.idx})">${escapeHtml(slice)}</span>`;
+      cursor = m.end;
+    });
+    html += escapeHtml(text.slice(cursor));
+    $('#annotatedText').innerHTML = html || escapeHtml(text);
+  }
+
+  // --- REPORT ---
+  function renderReport() {
+    if (!state.analysis) return;
+    $('#reportEmpty').classList.add('hidden');
+    $('#reportContent').classList.remove('hidden');
+
+    const a = state.analysis;
+    const m = a.metadata;
+    const sev = { critical: 0, major: 0, minor: 0, suggestion: 0 };
+    a.issues.forEach(i => sev[i.severity] = (sev[i.severity] || 0) + 1);
+
+    const sevLbl = { critical: 'Kritinė', major: 'Reikšminga', minor: 'Mažesnė', suggestion: 'Pasiūlymas' };
+    const date = new Date(a.timestamp);
+
+    const issuesHtml = a.issues.map(i => `
+      <div class="card mb-2">
+        <div class="flex flex-between mb-1">
+          <strong>${escapeHtml(i.title)}</strong>
+          <span class="badge badge-${i.severity === 'critical' ? 'error' : i.severity === 'major' ? 'warning' : i.severity === 'minor' ? 'info' : 'success'}">${sevLbl[i.severity]}</span>
+        </div>
+        <div class="card-subtitle"><strong>${escapeHtml(CATEGORIES[i.category]?.label || i.category)}</strong></div>
+        <p style="margin: 8px 0 0;">${escapeHtml(i.description || '')}</p>
+        ${i.quote ? `<div class="issue-quote">${escapeHtml(i.quote)}</div>` : ''}
+        ${i.recommendation ? `<div class="issue-recommendation"><strong>Rekomendacija</strong>${escapeHtml(i.recommendation)}</div>` : ''}
+        ${i.legalRef ? `<p style="margin-top: 6px;"><em>Teisinis pagrindas: ${escapeHtml(i.legalRef)}</em></p>` : ''}
+      </div>
+    `).join('');
+
+    $('#reportBody').innerHTML = `
+      <div class="card">
+        <div style="border-bottom: 3px solid var(--color-emerald); padding-bottom: 16px; margin-bottom: 24px;">
+          <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-graphite-50);">LITGRID AB · Pirkimų techninių specifikacijų asistentas</div>
+          <h1 style="font-size: 28px; margin: 8px 0 4px; color: var(--color-graphite);">Techninės specifikacijos analizės ataskaita</h1>
+          <div style="color: var(--color-graphite-50); font-size: 14px;">${date.toLocaleString('lt-LT')}</div>
+        </div>
+
+        <h2 style="color: var(--color-emerald);">1. Pirkimo informacija</h2>
+        <table class="data-table mb-3">
+          <tbody>
+            <tr><td><strong>Pirkimo pavadinimas</strong></td><td>${escapeHtml(m.title || '—')}</td></tr>
+            <tr><td><strong>Objekto tipas</strong></td><td>${escapeHtml({goods:'Prekės',services:'Paslaugos',works:'Darbai',mixed:'Mišrios'}[m.type] || m.type || '—')}</td></tr>
+            <tr><td><strong>CPV kodas</strong></td><td>${escapeHtml(m.cpv || '—')}</td></tr>
+            <tr><td><strong>Pirkimo būdas</strong></td><td>${escapeHtml(m.procedure || '—')}</td></tr>
+            <tr><td><strong>Numatoma vertė (be PVM)</strong></td><td>${m.value ? m.value.toLocaleString('lt-LT') + ' EUR' : '—'}</td></tr>
+            <tr><td><strong>Vertinimo kriterijus</strong></td><td>${escapeHtml({price:'Mažiausia kaina',cost:'Sąnaudos',best_price_quality:'Ekonomiškai naudingiausias'}[m.criteria] || m.criteria || '—')}</td></tr>
+          </tbody>
+        </table>
+
+        <h2 style="color: var(--color-emerald);">2. Vertinimo santrauka</h2>
+        <p>${escapeHtml(a.summary)}</p>
+        <table class="data-table mb-3">
+          <thead><tr><th>Sunkumo lygis</th><th>Skaičius</th></tr></thead>
+          <tbody>
+            <tr><td>Kritinės klaidos</td><td>${sev.critical}</td></tr>
+            <tr><td>Reikšmingos pastabos</td><td>${sev.major}</td></tr>
+            <tr><td>Mažesnės pastabos</td><td>${sev.minor}</td></tr>
+            <tr><td>Pasiūlymai</td><td>${sev.suggestion}</td></tr>
+            <tr><td><strong>Bendras balas</strong></td><td><strong>${a.score} / 100</strong></td></tr>
+          </tbody>
+        </table>
+
+        ${a.strengths.length ? `<h2 style="color: var(--color-emerald);">3. Stiprybės</h2><ul>${a.strengths.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ul>` : ''}
+
+        <h2 style="color: var(--color-emerald);">${a.strengths.length ? '4' : '3'}. Veiksmų planas</h2>
+        <ol>${(a.actionPlan || []).map(p => `<li>${escapeHtml(p)}</li>`).join('')}</ol>
+
+        <h2 style="color: var(--color-emerald);">${a.strengths.length ? '5' : '4'}. Detalios pastabos</h2>
+        ${issuesHtml}
+
+        <div style="border-top: 1px solid var(--color-graphite-15); margin-top: 32px; padding-top: 16px; font-size: 12px; color: var(--color-graphite-50);">
+          Ši ataskaita parengta automatiškai naudojant TS Asistentas įrankį. Ataskaita yra pagalbinė; galutinį sprendimą dėl specifikacijos turinio priima pirkimo organizatorius / komisija. Įrankis nepakeičia teisinės konsultacijos.
+        </div>
+      </div>
+    `;
+  }
+
+  function exportHtml() {
+    if (!state.analysis) return toast('Atlikite analizę.', 'error');
+    const css = document.querySelector('style').textContent;
+    const body = $('#reportBody').innerHTML;
+    const html = `<!DOCTYPE html><html lang="lt"><head><meta charset="UTF-8"><title>Ataskaita</title><style>${css}</style></head><body><div class="app-main"><div class="app-main-inner">${body}</div></div></body></html>`;
+    downloadBlob(html, 'TS_ataskaita_' + Date.now() + '.html', 'text/html');
+  }
+
+  function exportDocx() {
+    if (!state.analysis) return toast('Atlikite analizę.', 'error');
+    // Simple HTML-to-Word conversion using MS Word .doc compatibility
+    const css = `
+      body { font-family: 'Nunito Sans', Arial, sans-serif; color: #2E3641; line-height: 1.5; }
+      h1 { color: #2E3641; font-size: 24pt; }
+      h2 { color: #00A072; font-size: 16pt; margin-top: 24px; }
+      table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
+      th { background: #D7EEDB; border: 1px solid #00A072; padding: 8px; text-align: left; }
+      td { border: 1px solid #E1E2E4; padding: 8px; }
+      .badge { padding: 3px 8px; border-radius: 4px; font-size: 10pt; font-weight: bold; }
+      .badge-error { background: #FBEBEE; color: #DB354A; }
+      .badge-warning { background: #FEF6E8; color: #B47A00; }
+      .badge-info { background: #E8F7F9; color: #00667D; }
+      .badge-success { background: #EFF9F1; color: #00A072; }
+      .issue-quote { background: #EFF1F1; border-left: 3px solid #C7CDD3; padding: 8px 12px; margin: 8px 0; font-style: italic; }
+      .issue-recommendation { background: #EFF9F1; border-left: 3px solid #00A072; padding: 8px 12px; margin: 8px 0; }
+      .card { border: 1px solid #E1E2E4; padding: 16px; margin-bottom: 12px; }
+    `;
+    const body = $('#reportBody').innerHTML;
+    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><style>${css}</style></head><body>${body}</body></html>`;
+    const blob = new Blob(['﻿', html], { type: 'application/msword' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'TS_ataskaita_' + Date.now() + '.doc';
+    a.click();
+  }
+
+  function downloadBlob(content, name, type) {
+    const blob = new Blob([content], { type });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+  }
+
+  // --- KNOWLEDGE BASE ---
+  function renderKnowledgeBase() {
+    const kb = window.KNOWLEDGE_BASE;
+    if (!kb) return;
+    const html = kb.map(section => `
+      <div class="card mb-2">
+        <h3 class="card-title" style="color: var(--color-emerald);">${escapeHtml(section.title)}</h3>
+        <p class="card-subtitle">${escapeHtml(section.intro)}</p>
+        ${section.items.map(item => `
+          <details class="mt-2">
+            <summary>${escapeHtml(item.title)}</summary>
+            <div class="mt-1">
+              <p>${escapeHtml(item.description)}</p>
+              ${item.example ? `<div class="issue-quote">${escapeHtml(item.example)}</div>` : ''}
+              ${item.recommendation ? `<div class="issue-recommendation"><strong>Geroji praktika</strong>${escapeHtml(item.recommendation)}</div>` : ''}
+              ${item.legalRef ? `<p style="margin-top: 8px;"><span class="issue-legal">📜 ${escapeHtml(item.legalRef)}</span></p>` : ''}
+            </div>
+          </details>
+        `).join('')}
+      </div>
+    `).join('');
+    $('#knowledgeBase').innerHTML = html;
+  }
+
+  // === EXPORT ===
+  return {
+    init,
+    openSettings, closeSettings, saveSettings,
+    runAnalysis, runRulesOnly,
+    fetchUrl, removeFile, updateStats, clearText,
+    showIssueDetail, closeIssueModal,
+    filterCategory,
+    exportHtml, exportDocx,
+  };
+})();
+
+document.addEventListener('DOMContentLoaded', App.init);
+</script>
+
+<!-- CATEGORIES, RULE ENGINE, AI ANALYZER, KNOWLEDGE BASE will be in separate scripts loaded next -->
+<script>
+/* ============================================================
+   TS ASISTENTAS — Moduliai
+   - CATEGORIES
+   - KNOWLEDGE_BASE
+   - RuleEngine (deterministinės taisyklės)
+   - AIAnalyzer (Claude API integracija)
+   ============================================================ */
+
+// ---------- KATEGORIJOS ----------
+const CATEGORIES = {
+  brand_restriction: { label: 'Prekės ženklai / kilmė', icon: '🏷️' },
+  competition: { label: 'Konkurencijos ribojimas', icon: '⚖️' },
+  ambiguity: { label: 'Neaiškumai / dviprasmybės', icon: '❓' },
+  subjective: { label: 'Subjektyvūs kriterijai', icon: '🌡️' },
+  qualification: { label: 'Kvalifikaciniai reikalavimai', icon: '🎓' },
+  technical: { label: 'Techniniai reikalavimai', icon: '🔧' },
+  legal_compliance: { label: 'Teisinis atitikimas', icon: '📜' },
+  grammar: { label: 'Kalba / rašyba', icon: '✍️' },
+  structure: { label: 'Struktūra / formatas', icon: '🧱' },
+  measurement: { label: 'Matavimo vienetai / kiekiai', icon: '📐' },
+  evaluation: { label: 'Vertinimo kriterijai', icon: '🧮' },
+  contract_terms: { label: 'Sutarties sąlygos', icon: '📝' },
+  market_analysis: { label: 'Rinkos analizė', icon: '🌍' },
+  green: { label: 'Žaliasis pirkimas', icon: '🌱' },
+  innovation: { label: 'Inovacijos', icon: '💡' },
+  accessibility: { label: 'Prieinamumas', icon: '♿' },
+  scope: { label: 'Pirkimo apimtis / skaidymas', icon: '🧩' },
+  risk: { label: 'Rizikos / atsakomybės', icon: '⚠️' },
+};
+
+// ---------- ŽINIŲ BAZĖ ----------
+const KNOWLEDGE_BASE = [
+  {
+    title: '1. Prekės ženklas, kilmė, modelis',
+    intro: 'PĮ 33 str. draudžia nurodyti konkretų gaminį, šaltinį ar gamybos procesą, kuris būdingas tik konkrečiam tiekėjui ar produktui, jei tai apriboja konkurenciją. Išimtis — kai objekto neįmanoma kitaip apibūdinti; tokiu atveju privaloma rašyti „arba lygiavertis".',
+    items: [
+      {
+        title: 'Konkrečios prekės ženklo nuoroda be „arba lygiavertis"',
+        description: 'Specifikacijoje minimi konkretūs prekių ženklai (Siemens, ABB, Lean, Lions-Quest ir pan.) be lygiavertiškumo nuorodos, sukuria diskriminaciją.',
+        example: 'BLOGAI: „transformatorius Siemens 7SR..." → GERAI: „transformatorius Siemens 7SR... arba lygiavertis pagal 1 priede pateiktus parametrus"',
+        recommendation: 'Aprašykite funkcinius/techninius parametrus. Jei būtinai reikia paminėti ženklą — pridėkite „arba lygiavertis" ir paaiškinkite, ką laikote lygiaverčiu.',
+        legalRef: 'PĮ 33 str. 4 d.; ESFA leidinys 2 sk. 1 p.; LAT byla Nr. e3K-3-325-469/2018'
+      },
+      {
+        title: 'Netiesioginė diskriminacija per parametrų derinį',
+        description: 'Net jei prekės ženklas neminimas, parametrų rinkinys gali būti pritaikytas vienam tiekėjui (pvz., labai siauri matmenys, specifinė technologija).',
+        recommendation: 'Atlikite rinkos analizę: ar jūsų reikalavimus atitinka bent 3 tiekėjai? Jei ne — pakoreguokite (išplėskite tolerancijas, pakeiskite konkrečius parametrus į funkcinius).',
+        legalRef: 'PĮ 30 str.; ESFA leidinys 2 sk. 2 p.'
+      }
+    ]
+  },
+  {
+    title: '2. Aiškumas ir tikslumas',
+    intro: 'Skaidrumo principas reikalauja, kad pirkimo sąlygas vienodai suprastų visi dalyviai. Neaiškios, dviprasmiškos formuluotės pažeidžia šį principą.',
+    items: [
+      {
+        title: 'Subjektyvios sąvokos be objektyvių kriterijų',
+        description: 'Žodžiai „kokybiškas", „patikimas", „profesionalus", „aiškus", „realus", „pagrįstas" be matavimo kriterijų sukuria subjektyvų vertinimą.',
+        example: 'BLOGAI: „turi būti aukštos kokybės" → GERAI: „turi atitikti ISO 9001 standartą arba lygiavertį, pristatymo defektų lygis ≤ 0,5%"',
+        recommendation: 'Kiekvieną kokybinį teiginį pakeiskite matuojamu rodikliu, standartu, sertifikatu arba bandymo metodu.',
+        legalRef: 'PĮ 35 str. 1 d. 2 p.; LAT byla Nr. e3K-3-178-378/2018'
+      },
+      {
+        title: 'Dviprasmiški kiekio nurodymai',
+        description: 'Frazės „pakankamas kiekis", „prireikus", „kiek reikės" sukuria nežinomybę dėl pirkimo apimties.',
+        recommendation: 'Nurodykite konkrečius kiekius arba intervalus (min/max), arba bent prognozuojamą kiekį su tolerancija.',
+        legalRef: 'PĮ 35 str. 1 d.'
+      }
+    ]
+  },
+  {
+    title: '3. Konkurencijos ribojimas',
+    intro: 'Reikalavimai turi būti proporcingi pirkimo objektui ir nediskriminuoti tiekėjų.',
+    items: [
+      {
+        title: 'Per dideli kvalifikaciniai reikalavimai (panašios sutartys)',
+        description: 'Reikalavimas, kad tiekėjas būtų įvykdęs sutartis, kurių vertė viršija planuojamos sutarties vertę su Metodikoje numatytais koeficientais.',
+        recommendation: 'Vadovaukitės VPT Metodika: didelės vertės — koef. 0,3; vidutinės — 0,5; mažos — 0,7. Pvz., 100 000 EUR vertės sutarčiai galima reikalauti įvykdytos sutarties už min. 50 000 EUR.',
+        legalRef: 'PĮ 47 str.; VPT Tiekėjo kvalifikacijos nustatymo metodika 21.1.4 p.'
+      },
+      {
+        title: 'Konkretus specialistų skaičius be pagrindimo',
+        description: 'VPT rekomenduoja apibūdinti reikalingas kompetencijas, o ne nurodyti specialistų skaičių. Sprendimą dėl optimalaus išteklių derinio turi priimti tiekėjas.',
+        recommendation: 'Perkelkite akcentą iš kiekio į kompetencijas. Jei vis tiek reikalingas konkretus skaičius — paaiškinkite, kodėl ir kokias tiksliai funkcijas vykdys kiekvienas specialistas.',
+        legalRef: 'VPT rekomendacijos; ESFA leidinys 3 sk. 4 p.'
+      },
+      {
+        title: 'Per aukšti išsilavinimo reikalavimai',
+        description: 'Magistro/daktaro reikalavimas neretai nepagrįstas pirkimo objektu. Praktinė patirtis dažnai svarbiau.',
+        recommendation: 'Įvertinkite, ar magistro/daktaro laipsnis tikrai būtinas. Jei ne — palikite bakalauro lygmenį arba reikalavimą lygiaverčios profesinės patirties.',
+        legalRef: 'PĮ 47 str. 1 d.; LAT byla Nr. 3K-3-126/2010'
+      },
+      {
+        title: 'Reikalavimai nesusiję su pirkimo objektu',
+        description: 'Pvz., reikalauti viešojo valdymo tobulinimo patirties iš to, kas turi organizuoti mokymus apie viešąjį valdymą.',
+        recommendation: 'Visi kvalifikaciniai reikalavimai turi tiesiogiai sietis su pirkimo objektu. Klauskite — ar šis reikalavimas reikalingas BŪTENT ŠIO pirkimo sutarties įvykdymui?',
+        legalRef: 'PĮ 47 str. 1 d.'
+      }
+    ]
+  },
+  {
+    title: '4. Vertinimo kriterijai',
+    intro: 'Ekonomiškai naudingiausio pasiūlymo kriterijai turi būti objektyvūs, susiję su pirkimo objektu ir aiškiai aprašyta jų vertinimo metodika.',
+    items: [
+      {
+        title: 'Subjektyvūs vertinimo kriterijai',
+        description: '„Atitikimas perkančiojo poreikiams", „aiški metodika", „realus planas" yra subjektyvūs ir negali būti tikrinami objektyviai.',
+        example: 'BLOGAI: „rizikų valdymas pagrįstas" (vertina komisija) → GERAI: „rizikų registras turi apimti ne mažiau 15 rizikų, kiekvienai pateikta tikimybė (skalė 1–5), poveikio vertinimas (skalė 1–5) ir konkrečios mažinimo priemonės"',
+        recommendation: 'Kiekvienam kriterijui aprašykite: a) ką tiksliai vertina, b) kaip skaičiuojami balai (formulė), c) kokie yra žemiausias ir aukščiausias balai ir kuo jie skiriasi.',
+        legalRef: 'PĮ 55 str.; LAT byla Nr. e3K-3-178-378/2018'
+      }
+    ]
+  },
+  {
+    title: '5. Pirkimo apimtis ir skaidymas',
+    intro: 'PĮ skatina skaidyti pirkimą į dalis, kad galėtų dalyvauti smulkesni tiekėjai.',
+    items: [
+      {
+        title: 'Skirtingo pobūdžio paslaugų sujungimas',
+        description: 'Pavyzdžiui, projektavimas + remontas vienoje pirkimo objekto dalyje apriboja konkurenciją.',
+        recommendation: 'Skaidykite pagal: paslaugų pobūdį, regionus, technologines kategorijas. Jei jungiate — pateikite ekonominį/techninį pagrindimą.',
+        legalRef: 'PĮ 28 str. (skaidymas į dalis); ESFA leidinys 2 sk. 4–5 p.'
+      },
+      {
+        title: 'Dirbtinis pirkimo skaidymas',
+        description: 'Atvirkščia problema — pirkimas išskaidomas į kelis mažesnius, kad pakliūtų į žemesnio lygio procedūrą.',
+        recommendation: 'Identifikuokite pirkimus, kurie planuojami tuo pačiu metu, tam pačiam tikslui — sumokite jų vertes.',
+        legalRef: 'PĮ 9 str. (numatomos vertės skaičiavimas)'
+      }
+    ]
+  },
+  {
+    title: '6. Sutarties vykdymas',
+    intro: 'Sutartyje nustatytos sąlygos yra esminės ir negali būti keičiamos sutarties galiojimo metu (su išimtimis pagal PĮ 89 str.).',
+    items: [
+      {
+        title: 'Per griežtos arba per silpnos sutarties įvykdymo užtikrinimo priemonės',
+        description: 'Per griežti delspinigiai (>0,5% per dieną) gali būti laikomi neproporcingais; per maži — neefektyvūs.',
+        recommendation: 'Standartinis delspinigių dydis: 0,02–0,1% per dieną nuo neįvykdytos prievolės vertės. Maksimali delspinigių suma — 10% sutarties vertės.',
+        legalRef: 'CK 6.71 str.; teismų praktika'
+      },
+      {
+        title: 'Sutarties keitimo galimybės nenumatytos',
+        description: 'Jei nepramatote galimų pakeitimų (pvz., prievolių termino pratęsimas dėl objektyvių priežasčių), bet kokie pakeitimai bus laikomi neteisėtais.',
+        recommendation: 'Pirkimo sąlygose iš anksto suformuluokite, kokie pakeitimai galimi ir kokiomis sąlygomis (PĮ 89 str. peržiūros sąlygos).',
+        legalRef: 'PĮ 89 str.'
+      }
+    ]
+  },
+  {
+    title: '7. Žaliasis pirkimas ir tvarumas',
+    intro: 'Litgrid kaip strateginis energetikos sektoriaus subjektas privalo integruoti žaliuosius reikalavimus į pirkimus, kai tai įmanoma ir proporcinga.',
+    items: [
+      {
+        title: 'Trūksta žaliųjų kriterijų',
+        description: 'Specifikacijoje nenurodyti CO2 emisijos, energijos efektyvumo, perdirbto turinio, atliekų valdymo reikalavimai.',
+        recommendation: 'Naudokite ES GPP kriterijus (Green Public Procurement). Energetikos įrangai — IEC standartai dėl efektyvumo. Pakavimo medžiagoms — perdirbtas turinys ≥ 30%.',
+        legalRef: 'PĮ 35 str. 9 d.; LR aplinkos ministro įsakymas dėl žaliųjų pirkimų'
+      }
+    ]
+  }
+];
+
+// ---------- TAISYKLIŲ VARIKLIS ----------
+const RuleEngine = (() => {
+
+  // Žinomi prekių ženklai energetikos / IT srityje (nepilnas sąrašas, plečiamas)
+  const BRAND_NAMES = [
+    'Siemens', 'ABB', 'Schneider Electric', 'GE', 'General Electric', 'Hitachi', 'Mitsubishi',
+    'Cisco', 'HP', 'Dell', 'Lenovo', 'IBM', 'Oracle', 'Microsoft', 'SAP', 'Adobe', 'Autodesk',
+    'AutoCAD', 'Bentley', 'Allplan', 'Revit', 'Tekla',
+    'Lean', 'Six Sigma', 'Lions-Quest', 'PRINCE2', 'PMBOK',
+    'Apple', 'iPhone', 'iPad', 'MacBook',
+    'Intel', 'AMD', 'Nvidia',
+    'Volvo', 'Mercedes', 'BMW', 'Audi', 'Volkswagen', 'Toyota', 'MAN', 'Scania',
+    'Bosch', 'Festool', 'Makita', 'Hilti', 'DeWalt', 'Stihl', 'Husqvarna',
+    'Caterpillar', 'JCB', 'Komatsu',
+    'Wago', 'Phoenix Contact', 'Weidmüller', 'Eaton', 'Legrand',
+    'Rittal', 'Schroff',
+    'Nokia', 'Ericsson', 'Huawei', 'ZTE',
+    'Wartsilä', 'Cummins'
+  ];
+
+  // Subjektyvūs / dviprasmiški terminai. Galūnių apdorojimas — visos lietuviškos formos.
+  // Šaknis turi prasidėti žodžio pradžia (\b), o po jos leidžiamos 0–6 galūnės raidės.
+  const STEM = '[a-ząčęėįšųūž]{0,6}';
+  const SUBJECTIVE_TERMS = [
+    { word: 'kokybišk' + STEM, label: 'kokybiškas' },
+    { word: 'patikim' + STEM, label: 'patikimas' },
+    { word: 'profesional' + STEM, label: 'profesionalus' },
+    { word: 'modern' + STEM, label: 'modernus' },
+    { word: 'tinkam' + STEM, label: 'tinkamas' },
+    { word: 'efektyv' + STEM, label: 'efektyvus' },
+    { word: 'pagrįst' + STEM, label: 'pagrįstas' },
+    { word: 'aišk' + STEM, label: 'aiškus' },
+    { word: 'real' + STEM, label: 'realus' },
+    { word: 'optimal' + STEM, label: 'optimalus' },
+    { word: 'pakankam' + STEM, label: 'pakankamas' },
+    { word: 'ger' + STEM, label: 'geras' },
+    { word: 'naujausi' + STEM, label: 'naujausias' },
+    { word: 'aukštos kokybės', label: 'aukštos kokybės' },
+    { word: 'aukšto lygio', label: 'aukšto lygio' },
+    { word: 'rinkoje pripažint' + STEM, label: 'rinkoje pripažintas' },
+    { word: 'savo srities ekspert' + STEM, label: 'savo srities ekspertas' },
+    { word: 'lyderiaujant' + STEM, label: 'lyderiaujantis' },
+    { word: 'plačiai naudojam' + STEM, label: 'plačiai naudojamas' },
+    { word: 'pažangi' + STEM, label: 'pažangus' },
+    { word: 'inovaty' + STEM, label: 'inovatyvus' },
+  ];
+
+  // Dažni dviprasmiški kiekio žodžiai
+  const VAGUE_QUANTITIES = [
+    'pakankamas kiekis', 'prireikus', 'kiek reikės', 'esant poreikiui', 'pagal poreikį',
+    'reikiamą kiekį', 'tam tikras kiekis', 'apie [\\d]+', 'maždaug [\\d]+'
+  ];
+
+  // Dažnai naudojami terminai be standarto nuorodos
+  const STANDARDS_HINTS = [
+    { pattern: /\bISO\s*\d+/i, ok: true, name: 'ISO standartas' },
+    { pattern: /\bIEC\s*\d+/i, ok: true, name: 'IEC standartas' },
+    { pattern: /\bEN\s*\d+/i, ok: true, name: 'EN standartas' },
+    { pattern: /\bLST\s*EN/i, ok: true, name: 'LST EN' },
+  ];
+
+  // Diskriminaciniai matmenys
+  const SUSPICIOUS_PHRASES = [
+    { pattern: /\bbe pakeitim[uoų]\b/i, label: 'bandyta apibrėžti pakeitimą be jo' },
+    { pattern: /tik [a-ząčęėįšųūž]+ tiek[ėe]j/i, label: 'tik vienas tiekėjas' },
+    { pattern: /turi būti specialiai pritaikyt/i, label: 'specialiai pritaikytas — gali apriboti konkurenciją' },
+    { pattern: /\bpagal mūsų reikalavim/i, label: 'subjektyvus reikalavimas' },
+    { pattern: /\bidenti(ška[sm]?|fikuoja)\b/i, label: 'tapatumas — gali apriboti pakaitalus' },
+  ];
+
+  function regexAllPositions(text, pattern, flags = 'gi') {
+    const re = new RegExp(pattern, flags);
+    const out = [];
+    let m;
+    while ((m = re.exec(text)) !== null) {
+      out.push({ start: m.index, end: m.index + m[0].length, match: m[0] });
+      if (m.index === re.lastIndex) re.lastIndex++;
+    }
+    return out;
+  }
+
+  function getContext(text, start, end, ctx = 80) {
+    const s = Math.max(0, start - ctx);
+    const e = Math.min(text.length, end + ctx);
+    return text.slice(s, e).replace(/\s+/g, ' ').trim();
+  }
+
+  function checkBrands(text) {
+    const issues = [];
+    const lower = text.toLowerCase();
+    BRAND_NAMES.forEach(brand => {
+      const re = new RegExp(`\\b${brand.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')}\\b`, 'gi');
+      let m;
+      while ((m = re.exec(text)) !== null) {
+        const pos = m.index;
+        // Look at +/- 100 chars window for "lygiavertis"
+        const window = text.slice(Math.max(0, pos - 50), Math.min(text.length, pos + 100)).toLowerCase();
+        const hasEquivalent = /lygiaverti/.test(window) || /equivalen/i.test(window) || /arba\s+(lygiavert|panaš|alternat)/i.test(window);
+        if (!hasEquivalent) {
+          const ctx = getContext(text, pos, pos + brand.length);
+          issues.push({
+            id: 'brand-' + pos,
+            severity: 'critical',
+            category: 'brand_restriction',
+            source: 'rule',
+            title: `Prekės ženklas „${brand}" be „arba lygiavertis"`,
+            description: `Specifikacijoje paminėtas prekės/sprendimo pavadinimas, bet trūksta lygiavertiškumo nuorodos, kurios reikalauja PĮ 33 str.`,
+            quote: ctx,
+            recommendation: `Pridėkite frazę „arba lygiavertis" po „${brand}", arba aprašykite funkcinius/techninius parametrus, kuriuos turi atitikti pasiūlytas sprendimas.`,
+            alternative: `${brand} arba lygiavertis pagal žemiau pateikiamus parametrus: [išvardinti konkrečius parametrus].`,
+            legalRef: 'PĮ 33 str. 4 d.',
+            position: { start: pos, end: pos + brand.length }
+          });
+          break; // Avoid spamming same brand
+        }
+      }
+    });
+    return issues;
+  }
+
+  function checkSubjectiveTerms(text) {
+    const issues = [];
+    SUBJECTIVE_TERMS.forEach(term => {
+      const re = new RegExp(`\\b${term.word}\\b`, 'gi');
+      let m;
+      let count = 0;
+      while ((m = re.exec(text)) !== null && count < 3) {
+        count++;
+        const pos = m.index;
+        const ctx = getContext(text, pos, pos + m[0].length);
+        // Skip ONLY if the subjective term is immediately followed (within 60 chars) by a measurable clarifier
+        // e.g., "kokybiškas (atitinkantis ISO 9001)" arba "patikimas - MTBF ≥ 50 000 val."
+        const tail = text.slice(pos + m[0].length, pos + m[0].length + 60);
+        if (/^[\s,:;\-—–(]{0,5}(atitink|pagal\s+(ISO|IEC|EN|LST)|t\.y\.|t\.\s?y\.|\bMTBF\b|\bIP\d{2}\b|≥|≤|>=|<=)/i.test(tail)) continue;
+
+        issues.push({
+          id: 'subj-' + term.word + '-' + pos,
+          severity: 'major',
+          category: 'subjective',
+          source: 'rule',
+          title: `Subjektyvus terminas: „${m[0]}"`,
+          description: `Žodis „${term.label}" yra subjektyvus ir negali būti objektyviai patikrintas. Tai gali sukelti ginčus dėl pasiūlymų vertinimo ir pažeisti skaidrumo principą.`,
+          quote: ctx,
+          recommendation: 'Pakeiskite šį žodį konkrečiu matuojamu kriterijumi, standartu arba sertifikatu. Pavyzdžiui, vietoje „kokybiškas" — „atitinkantis ISO 9001"; vietoje „aukšto našumo" — „kurio efektyvumas ≥ 95%".',
+          legalRef: 'PĮ 35 str.; skaidrumo principas (PĮ 30 str.)',
+          position: { start: pos, end: pos + m[0].length }
+        });
+      }
+    });
+    return issues;
+  }
+
+  function checkVagueQuantities(text) {
+    const issues = [];
+    VAGUE_QUANTITIES.forEach(q => {
+      const re = new RegExp(`\\b${q}\\b`, 'gi');
+      let m;
+      while ((m = re.exec(text)) !== null) {
+        const ctx = getContext(text, m.index, m.index + m[0].length);
+        issues.push({
+          id: 'vq-' + m.index,
+          severity: 'major',
+          category: 'measurement',
+          source: 'rule',
+          title: `Neaiškus kiekis: „${m[0]}"`,
+          description: 'Pirkimo apimtis turi būti aiškiai apibrėžta. Frazė sukuria neapibrėžtumą tiekėjams skaičiuojant pasiūlymo kainą.',
+          quote: ctx,
+          recommendation: 'Nurodykite konkretų kiekį (vnt., kg, val., m³ ir pan.) arba intervalą su minimumu/maksimumu (pvz., „nuo 100 iki 200 vnt."), arba prognozuojamą kiekį su tolerancija (pvz., „apie 150 vnt., ±20%").',
+          legalRef: 'PĮ 35 str. 1 d.',
+          position: { start: m.index, end: m.index + m[0].length }
+        });
+        break; // one per phrase
+      }
+    });
+    return issues;
+  }
+
+  function checkSuspiciousPhrases(text) {
+    const issues = [];
+    SUSPICIOUS_PHRASES.forEach(phrase => {
+      const matches = text.matchAll(new RegExp(phrase.pattern.source, phrase.pattern.flags + (phrase.pattern.flags.includes('g') ? '' : 'g')));
+      for (const m of matches) {
+        const ctx = getContext(text, m.index, m.index + m[0].length);
+        issues.push({
+          id: 'susp-' + m.index,
+          severity: 'minor',
+          category: 'competition',
+          source: 'rule',
+          title: `Įtartina frazė: ${phrase.label}`,
+          description: 'Frazė gali signalizuoti netiesioginę konkurencijos riboją. Įvertinkite, ar formulavimas neapriboja konkurencijos.',
+          quote: ctx,
+          recommendation: 'Pakoreguokite formuluotę, kad ji būtų neutralesnė ir leistų alternatyvius sprendimus.',
+          position: { start: m.index, end: m.index + m[0].length }
+        });
+      }
+    });
+    return issues;
+  }
+
+  function checkQualifications(text, meta) {
+    const issues = [];
+    // Magistro / daktaro reikalavimai
+    const eduRe = /\b(magistr[oa][s]?|daktar[oa][s]?|PhD|MSc|MBA)\b/gi;
+    const matches = [...text.matchAll(eduRe)];
+    matches.slice(0, 2).forEach(m => {
+      const ctx = getContext(text, m.index, m.index + m[0].length);
+      issues.push({
+        id: 'edu-' + m.index,
+        severity: 'minor',
+        category: 'qualification',
+        source: 'rule',
+        title: `Aukšto lygio išsilavinimo reikalavimas: „${m[0]}"`,
+        description: 'Magistro/daktaro reikalavimas dažnai gali būti per aukštas. VPT praktikoje nustatyta, kad praktinė patirtis dažnai svarbiau už akademinį laipsnį.',
+        quote: ctx,
+        recommendation: 'Įvertinkite, ar šis išsilavinimo lygis tikrai būtinas pirkimo objekto kontekste. Apsvarstykite alternatyvą — bakalauro lygmuo + ne mažiau X metų atitinkamos srities patirties.',
+        legalRef: 'PĮ 47 str. 1 d.',
+        position: { start: m.index, end: m.index + m[0].length }
+      });
+    });
+
+    // Konkretus skaičius specialistų
+    const numSpecRe = /\b(?:ne\s+mažiau\s+kaip\s+|bent\s+|mažiausiai\s+)?(\d+)\s+(specialist|ekspert|inžinier|projektuotoj|programuotoj)/gi;
+    let m;
+    let cnt = 0;
+    while ((m = numSpecRe.exec(text)) !== null && cnt < 3) {
+      cnt++;
+      const ctx = getContext(text, m.index, m.index + m[0].length);
+      issues.push({
+        id: 'numspec-' + m.index,
+        severity: 'minor',
+        category: 'qualification',
+        source: 'rule',
+        title: `Konkretus specialistų skaičius: „${m[0]}"`,
+        description: 'VPT rekomenduoja apibūdinti reikalingas kompetencijas, o ne nurodyti specialistų skaičių.',
+        quote: ctx,
+        recommendation: 'Pakeiskite skaičiaus reikalavimą į kompetencijų sąrašą, leiskite tiekėjui pačiam parinkti optimalų komandos dydį.',
+        legalRef: 'VPT rekomendacijos',
+        position: { start: m.index, end: m.index + m[0].length }
+      });
+    }
+
+    return issues;
+  }
+
+  function checkLengthAndStructure(text) {
+    const issues = [];
+    if (text.length < 500) {
+      issues.push({
+        id: 'short',
+        severity: 'major',
+        category: 'structure',
+        source: 'rule',
+        title: 'Per trumpa specifikacija',
+        description: `Specifikacijos ilgis (${text.length} simbolių) yra labai trumpas. Profesionalūs pirkimai paprastai aprašomi išsamiau (≥ 2000 simbolių).`,
+        recommendation: 'Praplėskite specifikaciją: aprašykite pirkimo tikslus, funkcinius reikalavimus, techninius parametrus, kokybės kriterijus, pristatymo sąlygas, garantijas.'
+      });
+    }
+
+    // No headers/structure
+    if (!/\n\s*(\d+\.|[A-ZĄČĘĖĮŠŲŪŽ][A-ZĄČĘĖĮŠŲŪŽ\s]{3,})/m.test(text)) {
+      issues.push({
+        id: 'no-structure',
+        severity: 'minor',
+        category: 'structure',
+        source: 'rule',
+        title: 'Specifikacija neturi aiškios struktūros',
+        description: 'Tekste neaptikta numeruotų skyrių ar antraščių. Tai apsunkina tiekėjų supratimą.',
+        recommendation: 'Suskaidykite specifikaciją į skyrius: 1) Bendra informacija, 2) Pirkimo objekto aprašymas, 3) Techniniai reikalavimai, 4) Kokybės reikalavimai, 5) Sutarties vykdymas, 6) Garantijos.'
+      });
+    }
+    return issues;
+  }
+
+  function checkLithuanianGrammar(text) {
+    const issues = [];
+    // Common typos and grammar issues in Lithuanian (lightweight checks)
+    const typos = [
+      { wrong: /\bjegu\b/gi, right: 'jeigu' },
+      { wrong: /\boriginalas\b/gi, right: 'originalas' }, // placeholder
+      { wrong: /\btoki[uo]\b/gi, right: 'tokiu/tokio' }, // ambiguous, skip
+    ];
+    // Mostly skip — better leave grammar to AI
+
+    // Double spaces
+    if (/  +/.test(text)) {
+      issues.push({
+        id: 'double-space',
+        severity: 'suggestion',
+        category: 'grammar',
+        source: 'rule',
+        title: 'Tekste yra dvigubų tarpų',
+        description: 'Dvigubi tarpai sumažina dokumento profesionalumą.',
+        recommendation: 'Pakeiskite visus dvigubus tarpus į vienetinius (Find & Replace).'
+      });
+    }
+
+    // Smart quotes inconsistency
+    const quotePairs = (text.match(/"/g) || []).length;
+    if (quotePairs > 0 && (text.match(/[„""]/g) || []).length === 0) {
+      issues.push({
+        id: 'quotes',
+        severity: 'suggestion',
+        category: 'grammar',
+        source: 'rule',
+        title: 'Naudojami paprasti kabutės vietoje lietuviškų',
+        description: 'Lietuvių kalboje rekomenduojama naudoti „dvigubas apatines kabutes" pradžioje ir „viršutines" pabaigoje.',
+        recommendation: 'Pakeiskite " kabutes į „ ir " porą.'
+      });
+    }
+    return issues;
+  }
+
+  function checkContractTerms(text) {
+    const issues = [];
+    if (!/garantij/i.test(text)) {
+      issues.push({
+        id: 'no-warranty',
+        severity: 'minor',
+        category: 'contract_terms',
+        source: 'rule',
+        title: 'Specifikacijoje nepaminėta garantija',
+        description: 'Garantijos sąlygos yra svarbi specifikacijos dalis prekėms ir paslaugoms.',
+        recommendation: 'Aprašykite garantijos terminą (pvz., 24 mėn.), garantinio aptarnavimo apimtį, atsako laiką avariniais atvejais, ir kitus garantijos aspektus.'
+      });
+    }
+    if (!/delspinig|netesyb|baud/i.test(text)) {
+      issues.push({
+        id: 'no-penalty',
+        severity: 'minor',
+        category: 'contract_terms',
+        source: 'rule',
+        title: 'Nepaminėta atsakomybė už netinkamą vykdymą',
+        description: 'Sutarties įvykdymo užtikrinimo priemonės (delspinigiai, baudos) skatina tiekėjus laikytis terminų.',
+        recommendation: 'Numatykite delspinigius už pavėluotą įvykdymą (rekomendacija: 0,02–0,05% per dieną nuo nesuteiktos paslaugos vertės) ir baudas už esmines sutarties pažeidimus.'
+      });
+    }
+    return issues;
+  }
+
+  function checkScopeSplitting(text, meta) {
+    const issues = [];
+    if (meta?.flags?.parts === false && (meta?.value || 0) > 100000) {
+      issues.push({
+        id: 'no-parts',
+        severity: 'minor',
+        category: 'scope',
+        source: 'rule',
+        title: 'Pirkimas neskaidomas į dalis',
+        description: `Pirkimo vertė (${meta.value.toLocaleString('lt-LT')} EUR) yra reikšminga, o pirkimas neskaidomas į dalis. PĮ skatina skaidymą, kad būtų pritraukti smulkesni tiekėjai.`,
+        recommendation: 'Apsvarstykite skaidymą pagal regioną, paslaugų pobūdį, technologinę sritį arba apimtį. Jei skaidymas netikslingas — pirkimo dokumentuose pateikite ekonominį/techninį pagrindimą.',
+        legalRef: 'PĮ 28 str.'
+      });
+    }
+    return issues;
+  }
+
+  function run(text, meta) {
+    const issues = [
+      ...checkBrands(text),
+      ...checkSubjectiveTerms(text),
+      ...checkVagueQuantities(text),
+      ...checkSuspiciousPhrases(text),
+      ...checkQualifications(text, meta),
+      ...checkLengthAndStructure(text),
+      ...checkLithuanianGrammar(text),
+      ...checkContractTerms(text),
+      ...checkScopeSplitting(text, meta),
+    ];
+
+    return { issues, ranAt: new Date().toISOString() };
+  }
+
+  return { run, CATEGORIES };
+})();
+
+// ---------- AI ANALIZĖ (Claude API) ----------
+const AIAnalyzer = (() => {
+
+  const SYSTEM_PROMPT = `Tu esi ekspertas Lietuvos viešųjų pirkimų teisės ir techninių specifikacijų srityje, kuris padeda LITGRID AB (Lietuvos elektros perdavimo sistemos operatoriui) parengti aukštos kokybės technines specifikacijas.
+
+KONTEKSTAS:
+- LITGRID AB yra perkantysis subjektas pagal LR Pirkimų, atliekamų vandentvarkos, energetikos, transporto ar pašto paslaugų srities perkančiųjų subjektų įstatymą (PĮ).
+- Taikoma ES Direktyva 2014/25/ES (sektorinė direktyva).
+- Pagrindinis priežiūros institucija — Viešųjų pirkimų tarnyba (VPT).
+- Sektorius — kritinė elektros perdavimo infrastruktūra.
+
+TAVO UŽDUOTIS:
+Atlikti išsamią pateiktos techninės specifikacijos analizę pagal šias kryptis:
+
+1. **TEISINIS ATITIKIMAS (PĮ)**:
+   - PĮ 30 str. — skaidrumo, lygiateisiškumo, nediskriminavimo principai
+   - PĮ 33 str. — techninių specifikacijų reikalavimai (be prekės ženklo, su „arba lygiavertis")
+   - PĮ 35 str. — aiškumas, tikslumas, nedviprasmiškumas
+   - PĮ 47 str. — kvalifikaciniai reikalavimai (proporcingumas, susietumas)
+   - PĮ 55 str. — pasiūlymų vertinimo kriterijai
+   - PĮ 28 str. — skaidymas į dalis
+   - PĮ 89 str. — sutarties pakeitimai
+
+2. **VPT PRAKTIKA**:
+   - Tiekėjo kvalifikacijos nustatymo metodika
+   - LAT bylos: e3K-3-325-469/2018, e3K-3-178-378/2018, e3K-3-396-969/2017
+   - Dažniausios klaidos: brand restriction, subjektyvūs terminai, neproporcingi kvalifikaciniai reikalavimai
+
+3. **SPECIFIKACIJOS KOKYBĖ**:
+   - Aiškumas, struktūra, vidinė nuoseklumas
+   - Funkciniai vs. techniniai reikalavimai
+   - Matavimo vienetai ir kiekiai
+   - Standartų ir sertifikatų nuorodos (ISO, IEC, EN, LST EN)
+
+4. **KONKURENCIJA**:
+   - Ar reikalavimus gali atitikti ne mažiau 3 tiekėjai?
+   - Ar nėra netiesioginės diskriminacijos per parametrų derinį?
+   - Ar pirkimas tinkamai skaidomas (ar nebūtų geriau)?
+
+5. **PRAKTINIAI PASIŪLYMAI**:
+   - Alternatyvūs formuluočiai
+   - Trūkstamos sekcijos (garantijos, sutarties vykdymo užtikrinimas, žaliųjų aspektų)
+   - Geroji praktika
+
+ATSAKYMO FORMATAS:
+Privalomai grąžink tik validų JSON objektą su tokia struktūra (be jokio įvadinio teksto, be markdown kodo blokų):
+
+{
+  "summary": "2-3 sakinių santrauka apie specifikacijos kokybę",
+  "strengths": ["stiprybė 1", "stiprybė 2", "..."],
+  "actionPlan": ["1 prioritetinis veiksmas", "2 prioritetinis veiksmas", "..."],
+  "issues": [
+    {
+      "title": "Trumpas pastabos pavadinimas (5-10 žodžių)",
+      "description": "Detalesnis paaiškinimas kas yra problema (1-3 sakiniai)",
+      "severity": "critical|major|minor|suggestion",
+      "category": "brand_restriction|competition|ambiguity|subjective|qualification|technical|legal_compliance|grammar|structure|measurement|evaluation|contract_terms|market_analysis|green|innovation|accessibility|scope|risk",
+      "quote": "Tikslus citatas iš specifikacijos teksto, kuriame yra problema (jei taikoma)",
+      "recommendation": "Konkretus pasiūlymas kaip pataisyti",
+      "alternative": "Alternatyvus formuluočia (jei taikoma)",
+      "legalRef": "PĮ straipsnio nuoroda arba VPT/LAT praktika (jei taikoma)"
+    }
+  ]
+}
+
+SUNKUMO LYGIAI:
+- "critical" — tiesioginis PĮ pažeidimas, gali baigtis pirkimo nutraukimu
+- "major" — aukšta diskriminacijos ar ginčytinumo rizika
+- "minor" — formuluotės/struktūros tobulinimo galimybė
+- "suggestion" — geroji praktika, neprivaloma
+
+SVARBU:
+- Neišgalvok pastabų — analizuok tik tai kas yra tekste
+- "quote" turi būti TIKSLI ištrauka iš pateikto teksto (galima sutrumpinti, bet neperformuluoti)
+- Visos pastabos lietuvių kalba, profesionaliu tonu
+- Maksimaliai 25 pastabos, prioritezuojant kritines ir reikšmingas`;
+
+  async function analyze(text, meta, ruleResults, settings, onProgress) {
+    const userMessage = buildUserMessage(text, meta, ruleResults, settings);
+    onProgress?.('Siunčiamas užklausimas Claude...', 10);
+
+    const response = await callClaude(userMessage, settings);
+    onProgress?.('Apdorojamas atsakymas...', 80);
+
+    return parseResponse(response);
+  }
+
+  function buildUserMessage(text, meta, ruleResults, settings) {
+    const opts = settings.options || {};
+    const optionsList = Object.entries(opts)
+      .filter(([_, v]) => v)
+      .map(([k]) => ({
+        grammar: 'gramatika ir rašyba',
+        clarity: 'aiškumas ir nedviprasmiškumas',
+        legal: 'PĮ atitiktis ir teisinė rizika',
+        competition: 'konkurencijos ribojimo analizė',
+        market: 'rinkos / techninių sprendimų pasiūlymai',
+        green: 'žaliųjų pirkimų aspektai',
+        accessibility: 'prieinamumo reikalavimai'
+      }[k] || k))
+      .join(', ');
+
+    const metaBlock = `
+PIRKIMO KONTEKSTAS:
+- Pavadinimas: ${meta.title || '(nenurodyta)'}
+- Objekto tipas: ${meta.type || '(nenurodyta)'}
+- CPV: ${meta.cpv || '(nenurodyta)'}
+- Procedūra: ${meta.procedure || '(nenurodyta)'}
+- Numatoma vertė: ${meta.value ? meta.value.toLocaleString('lt-LT') + ' EUR be PVM' : '(nenurodyta)'}
+- Vertinimo kriterijus: ${meta.criteria || '(nenurodyta)'}
+- Specialūs aspektai: ${Object.entries(meta.flags || {}).filter(([_, v]) => v).map(([k]) => k).join(', ') || 'nėra'}
+- Trumpas aprašymas: ${meta.description || '(nenurodyta)'}
+
+PRIORITETINĖS ANALIZĖS KRYPTYS: ${optionsList || 'visos'}
+
+JAU APTIKTŲ TAISYKLIŲ KLAIDŲ KIEKIS: ${ruleResults.issues.length}
+(Šios klaidos jau aptiktos taisyklių varikliu — nepateikinėk jų pakartotinai. Sutelk dėmesį į gilesnę analizę: kontekstinius, teisinius, struktūrinius klausimus.)
+
+DEPTH: ${settings.depth}
+${settings.depth === 'quick' ? 'Pateik max 10 svarbiausių pastabų.' : settings.depth === 'deep' ? 'Pateik išsamią analizę, max 25 pastabų.' : 'Pateik max 18 svarbiausių pastabų.'}`;
+
+    return `${metaBlock}
+
+=== TECHNINĖS SPECIFIKACIJOS TEKSTAS ===
+${text}
+=== TEKSTO PABAIGA ===
+
+Atlik specifikacijos analizę pagal sistemos prompt'e nurodytas kryptis ir grąžink JSON.`;
+  }
+
+  async function callClaude(userMessage, settings) {
+    const endpoint = settings.apiEndpoint || 'https://api.anthropic.com/v1/messages';
+    const body = {
+      model: settings.model || 'claude-sonnet-4-6',
+      max_tokens: 8000,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: userMessage }]
+    };
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': settings.apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`API klaida ${response.status}: ${errText.slice(0, 200)}`);
+    }
+
+    const data = await response.json();
+    const content = data.content?.[0]?.text || '';
+    return content;
+  }
+
+  function parseResponse(content) {
+    // Strip markdown code fences if present
+    let cleaned = content.trim();
+    cleaned = cleaned.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '');
+
+    // Try to find JSON in the response
+    const jsonStart = cleaned.indexOf('{');
+    const jsonEnd = cleaned.lastIndexOf('}');
+    if (jsonStart >= 0 && jsonEnd > jsonStart) {
+      cleaned = cleaned.slice(jsonStart, jsonEnd + 1);
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch (e) {
+      console.error('Failed to parse AI response:', cleaned);
+      throw new Error('AI atsakymas nėra validus JSON. Bandykite dar kartą.');
+    }
+
+    // Normalize issues
+    const issues = (parsed.issues || []).map((i, idx) => ({
+      id: 'ai-' + idx,
+      title: i.title || 'Pastaba',
+      description: i.description || '',
+      severity: ['critical', 'major', 'minor', 'suggestion'].includes(i.severity) ? i.severity : 'minor',
+      category: i.category || 'technical',
+      quote: i.quote || '',
+      recommendation: i.recommendation || '',
+      alternative: i.alternative || '',
+      legalRef: i.legalRef || '',
+      source: 'ai'
+    }));
+
+    return {
+      issues,
+      summary: parsed.summary || '',
+      strengths: parsed.strengths || [],
+      actionPlan: parsed.actionPlan || []
+    };
+  }
+
+  return { analyze };
+})();
+
+// Make available globally
+window.CATEGORIES = CATEGORIES;
+window.KNOWLEDGE_BASE = KNOWLEDGE_BASE;
+window.RuleEngine = RuleEngine;
+window.AIAnalyzer = AIAnalyzer;
+
+</script>
+
+</body>
+</html>
