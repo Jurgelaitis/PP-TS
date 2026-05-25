@@ -1121,6 +1121,360 @@ details[open] summary {
 }
 
 .switch-label { font-size: 14px; font-weight: 500; }
+
+/* === WIZARD / STEPPER === */
+.stepper {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-3);
+  background: var(--color-white);
+  border: 1px solid var(--color-graphite-15);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  gap: var(--space-1);
+  overflow-x: auto;
+}
+
+.stepper-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--color-graphite-50);
+  white-space: nowrap;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+}
+
+.stepper-step:hover {
+  background: var(--color-graphite-5);
+}
+
+.stepper-step.active {
+  color: var(--color-graphite);
+  font-weight: 700;
+}
+
+.stepper-step.completed { color: var(--color-emerald); }
+
+.stepper-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-graphite-15);
+  color: var(--color-graphite-50);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.stepper-step.active .stepper-num {
+  background: var(--color-emerald);
+  color: white;
+}
+
+.stepper-step.completed .stepper-num {
+  background: var(--color-emerald);
+  color: white;
+}
+
+.stepper-step.completed .stepper-num::after { content: "✓"; }
+.stepper-step.completed .stepper-num span { display: none; }
+
+.stepper-arrow {
+  color: var(--color-graphite-30);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+.wizard-step { display: none; }
+.wizard-step.active { display: block; }
+
+.wizard-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-graphite-15);
+}
+
+/* === QUESTION CARDS === */
+.qa-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-graphite-15);
+  border-left: 4px solid var(--color-cyan);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.qa-card.answered { border-left-color: var(--color-emerald); }
+.qa-card.critical { border-left-color: var(--color-error); }
+
+.qa-question {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.qa-question-num {
+  background: var(--color-cyan);
+  color: white;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.qa-card.critical .qa-question-num { background: var(--color-error); }
+.qa-card.answered .qa-question-num { background: var(--color-emerald); }
+
+.qa-question-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-graphite);
+  line-height: 1.5;
+}
+
+.qa-question-hint {
+  font-size: 12px;
+  color: var(--color-graphite-50);
+  font-weight: 400;
+  margin-top: 4px;
+}
+
+/* === GENERATED CONTENT === */
+.gen-preview {
+  background: var(--color-white);
+  border: 1px solid var(--color-graphite-15);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  max-height: 600px;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--color-graphite);
+}
+
+.gen-preview h1, .gen-preview h2, .gen-preview h3 {
+  color: var(--color-graphite);
+  margin-top: var(--space-3);
+  margin-bottom: var(--space-1);
+}
+
+.gen-preview h1 {
+  font-size: 22px;
+  border-bottom: 3px solid var(--color-emerald);
+  padding-bottom: 8px;
+}
+
+.gen-preview h2 {
+  font-size: 18px;
+  color: var(--color-emerald);
+}
+
+.gen-preview h3 {
+  font-size: 15px;
+}
+
+.gen-preview ul, .gen-preview ol {
+  padding-left: 24px;
+  margin: 8px 0;
+}
+
+.gen-preview li {
+  margin-bottom: 4px;
+}
+
+.gen-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 13px;
+}
+
+.gen-preview table th {
+  background: var(--color-green-15);
+  border: 1px solid var(--color-emerald);
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 700;
+}
+
+.gen-preview table td {
+  border: 1px solid var(--color-graphite-15);
+  padding: 8px 12px;
+}
+
+.gen-section {
+  margin-bottom: var(--space-3);
+}
+
+/* === PRICE CARD === */
+.price-display {
+  background: linear-gradient(135deg, var(--color-emerald) 0%, var(--color-emerald-50) 100%);
+  color: white;
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  text-align: center;
+}
+
+.price-display .price-label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.9;
+}
+
+.price-display .price-value {
+  font-size: 36px;
+  font-weight: 800;
+  margin: 8px 0;
+  line-height: 1;
+}
+
+.price-display .price-range {
+  font-size: 14px;
+  opacity: 0.95;
+}
+
+.price-bar {
+  background: var(--color-graphite-5);
+  border-radius: 999px;
+  height: 12px;
+  position: relative;
+  margin: 16px 0 8px;
+}
+
+.price-bar-range {
+  position: absolute;
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-warning) 0%, var(--color-emerald) 50%, var(--color-warning) 100%);
+  border-radius: 999px;
+}
+
+.price-bar-marker {
+  position: absolute;
+  top: -4px;
+  width: 4px;
+  height: 20px;
+  background: var(--color-graphite);
+  border-radius: 2px;
+  transform: translateX(-50%);
+}
+
+.price-source-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.price-source-item {
+  padding: 10px 12px;
+  background: var(--color-graphite-5);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  font-size: 13px;
+  display: flex;
+  gap: 10px;
+}
+
+.price-source-icon {
+  color: var(--color-emerald);
+  flex-shrink: 0;
+}
+
+/* === CPV / TAG CHIPS === */
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-cyan-5);
+  color: var(--color-blue);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  margin: 2px 4px 2px 0;
+}
+
+.tag-chip-remove {
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.tag-chip-remove:hover { opacity: 1; }
+
+/* === REFERENCE SAMPLES === */
+.ref-sample {
+  background: var(--color-graphite-5);
+  border-left: 3px solid var(--color-cyan);
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.ref-sample-header {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+/* === STEP HEADER === */
+.step-header {
+  margin-bottom: var(--space-3);
+}
+
+.step-header h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-graphite);
+}
+
+.step-header p {
+  margin: 0;
+  color: var(--color-graphite-50);
+  font-size: 14px;
+}
+
+/* === COMPLIANCE TABLE PREVIEW === */
+.compliance-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.compliance-preview th {
+  background: var(--color-graphite);
+  color: white;
+  padding: 8px;
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.compliance-preview td {
+  border: 1px solid var(--color-graphite-15);
+  padding: 8px;
+  vertical-align: top;
+}
+
+.compliance-preview tr:nth-child(even) td { background: var(--color-graphite-5); }
+
 </style>
 </head>
 <body>
@@ -1152,9 +1506,13 @@ details[open] summary {
   <!-- TABS -->
   <nav class="app-tabs">
     <div class="app-tabs-inner">
-      <button class="tab-btn active" data-tab="input">
+      <button class="tab-btn active" data-tab="generate">
+        <svg class="tab-icon" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+        Sukurti TS
+      </button>
+      <button class="tab-btn" data-tab="input">
         <svg class="tab-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Įvestis
+        Tikrinti TS
       </button>
       <button class="tab-btn" data-tab="metadata">
         <svg class="tab-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
@@ -1181,7 +1539,394 @@ details[open] summary {
     <div class="app-main-inner">
 
       <!-- INPUT TAB -->
-      <section class="tab-panel active" data-panel="input">
+      <!-- GENERATE TAB (lead feature) -->
+      <section class="tab-panel active" data-panel="generate">
+        <div class="hero">
+          <div class="hero-content">
+            <h2>Sugeneruokite <span class="accent">aukštos kokybės TS</span> nuo nulio per kelias minutes</h2>
+            <p>Įveskite tik pirkimo pavadinimą, kiekį ir trukmę — įrankis automatiškai sugeneruos teisinę bei VPT praktikai atitinkančią techninę specifikaciją, pridės atitikties lentelę (Priedas Nr. 1) ir įvertins rekomenduojamą rinkos kainą.</p>
+            <div class="hero-meta">
+              <div class="hero-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                PĮ atitiktis nuo pirmos dienos
+              </div>
+              <div class="hero-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                CVP IS analogų sintezė
+              </div>
+              <div class="hero-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                Rinkos kainos vertinimas
+              </div>
+              <div class="hero-meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Tiesioginis DOCX eksportas
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stepper -->
+        <div class="stepper" id="genStepper">
+          <div class="stepper-step active" data-step="1" onclick="App.goToStep(1)">
+            <span class="stepper-num"><span>1</span></span>
+            Pirminė informacija
+          </div>
+          <svg class="stepper-arrow ico" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          <div class="stepper-step" data-step="2" onclick="App.goToStep(2)">
+            <span class="stepper-num"><span>2</span></span>
+            AI klausimai
+          </div>
+          <svg class="stepper-arrow ico" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          <div class="stepper-step" data-step="3" onclick="App.goToStep(3)">
+            <span class="stepper-num"><span>3</span></span>
+            Analogai ir kontekstas
+          </div>
+          <svg class="stepper-arrow ico" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          <div class="stepper-step" data-step="4" onclick="App.goToStep(4)">
+            <span class="stepper-num"><span>4</span></span>
+            Generavimas
+          </div>
+          <svg class="stepper-arrow ico" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          <div class="stepper-step" data-step="5" onclick="App.goToStep(5)">
+            <span class="stepper-num"><span>5</span></span>
+            Eksportas
+          </div>
+        </div>
+
+        <!-- STEP 1: BASIC INFO -->
+        <div class="wizard-step active" data-wizard-step="1">
+          <div class="step-header">
+            <h2>1. Pirminė informacija apie pirkimą</h2>
+            <p>Įveskite tik tai, ką žinote. Trūkstamą informaciją AI paklaus sekančiame žingsnyje.</p>
+          </div>
+
+          <div class="grid grid-2">
+            <div class="card">
+              <h3 class="card-title">Pagrindinė informacija</h3>
+
+              <div class="form-group">
+                <label class="form-label" for="genTitle">Pirkimo pavadinimas <span class="req">*</span></label>
+                <input type="text" id="genTitle" class="form-input" placeholder="pvz., 330 kV elektros perdavimo linijos atramų antikorozinė danga" />
+                <div class="form-help">Kuo konkretesnis pavadinimas — tuo geresnė bus sugeneruota TS.</div>
+              </div>
+
+              <div class="grid grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="genType">Pirkimo objekto tipas <span class="req">*</span></label>
+                  <select id="genType" class="form-select">
+                    <option value="goods">Prekės</option>
+                    <option value="services">Paslaugos</option>
+                    <option value="works">Darbai</option>
+                    <option value="mixed">Mišrios</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="genCpv">CPV kodas <span class="help">(neprivaloma)</span></label>
+                  <input type="text" id="genCpv" class="form-input" placeholder="pvz., 50532000" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="genPurpose">Pirkimo paskirtis / tikslas</label>
+                <textarea id="genPurpose" class="form-textarea" style="min-height:80px;" placeholder="Trumpai aprašykite, kam reikalingas šis pirkimas, kokias problemas spręs Litgrid sistemoje."></textarea>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-title">Apimtis ir terminai</h3>
+
+              <div class="grid grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="genQuantity">Kiekis</label>
+                  <input type="text" id="genQuantity" class="form-input" placeholder="pvz., 12 vnt., 5000 m, 1 sistema" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="genUnit">Matavimo vienetas</label>
+                  <input type="text" id="genUnit" class="form-input" placeholder="vnt., kompl., m, m², h" />
+                </div>
+              </div>
+
+              <div class="grid grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="genDuration">Sutarties trukmė <span class="help">(mėn.)</span></label>
+                  <input type="number" id="genDuration" class="form-input" placeholder="12" min="1" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="genDeadline">Pristatymo / atlikimo terminas</label>
+                  <input type="text" id="genDeadline" class="form-input" placeholder="pvz., per 6 mėn. nuo sutarties sudarymo" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="genLocation">Atlikimo / pristatymo vieta</label>
+                <input type="text" id="genLocation" class="form-input" placeholder="pvz., Litgrid AB transformatorinės visoje Lietuvoje" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="genBudget">Numatoma vertė <span class="help">(jei žinoma, EUR be PVM)</span></label>
+                <input type="number" id="genBudget" class="form-input" placeholder="0" min="0" step="1000" />
+                <div class="form-help">Jei nepateikiate, įrankis pats įvertins.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card mt-3">
+            <h3 class="card-title">Specialūs reikalavimai ir kontekstas</h3>
+            <div class="form-group">
+              <label class="form-label" for="genSpecial">Konkretūs reikalavimai, ribojimai, sąlygos</label>
+              <textarea id="genSpecial" class="form-textarea" style="min-height:100px;" placeholder="pvz., privalo veikti -40 °C iki +40 °C; sąsaja su SCADA; SCC TUV sertifikatas; 24 mėn. garantija; saugumo lygis IEC 62443-3-3 SL2..."></textarea>
+            </div>
+
+            <div class="grid grid-2">
+              <div class="form-group">
+                <label class="form-label" for="genCriteria">Pasiūlymų vertinimo kriterijus</label>
+                <select id="genCriteria" class="form-select">
+                  <option value="">— AI parinks —</option>
+                  <option value="price">Mažiausia kaina</option>
+                  <option value="cost">Sąnaudos (gyvavimo ciklas)</option>
+                  <option value="best_price_quality">Ekonomiškai naudingiausias (kaina/kokybė)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Papildomi aspektai</label>
+                <div style="display: grid; gap: 6px;">
+                  <label class="switch"><input type="checkbox" id="genFlagGreen"><span class="switch-track"></span><span class="switch-label">Žaliasis pirkimas</span></label>
+                  <label class="switch"><input type="checkbox" id="genFlagInnovation"><span class="switch-track"></span><span class="switch-label">Inovacinis aspektas</span></label>
+                  <label class="switch"><input type="checkbox" id="genFlagCritical" checked><span class="switch-track"></span><span class="switch-label">Kritinė infrastruktūra</span></label>
+                  <label class="switch"><input type="checkbox" id="genFlagParts"><span class="switch-track"></span><span class="switch-label">Skaidoma į dalis</span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="wizard-footer">
+            <span class="card-subtitle">Žingsnis 1 iš 5</span>
+            <button class="btn btn-primary btn-lg" onclick="App.startGeneration()">
+              Pradėti generavimą
+              <svg class="ico" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 2: AI QUESTIONS -->
+        <div class="wizard-step" data-wizard-step="2">
+          <div class="step-header">
+            <h2>2. AI sugeneruoti patikslinimo klausimai</h2>
+            <p>Pagal jūsų pateiktą informaciją AI nustatė, kurios detalės yra reikalingos kokybiškos TS sukūrimui. Atsakykite į svarbiausius klausimus — atsakymas „nežinau" arba „nesvarbu" taip pat priimtinas.</p>
+          </div>
+
+          <div id="genQuestionsLoading" class="card">
+            <div class="empty-state">
+              <div class="spinner spinner-lg"></div>
+              <h3 class="mt-2">Generuojami klausimai...</h3>
+              <p>AI analizuoja jūsų pirkimo pavadinimą ir nustato, kokios papildomos informacijos reikia tobulai TS.</p>
+            </div>
+          </div>
+
+          <div id="genQuestionsList" class="hidden"></div>
+
+          <div class="wizard-footer">
+            <button class="btn btn-secondary" onclick="App.goToStep(1)">
+              <svg class="ico" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+              Atgal
+            </button>
+            <button class="btn btn-primary" onclick="App.goToStep(3)" id="btnQuestionsNext" disabled>
+              Toliau: Analogai
+              <svg class="ico" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 3: ANALOGUES -->
+        <div class="wizard-step" data-wizard-step="3">
+          <div class="step-header">
+            <h2>3. Analogiški pirkimai ir kontekstas</h2>
+            <p>AI sugeneravo CVP IS paieškos nuorodas analogiškiems pirkimams. Atidarykite jas naujuose skirtukuose, peržiūrėkite gerus pavyzdžius ir galite įklijuoti jų techninių specifikacijų fragmentus žemiau — tai labai pagerins galutinio TS kokybę.</p>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">
+              <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              CVP IS paieškos nuorodos
+            </h3>
+            <p class="card-subtitle">Pasirinktos pagal jūsų pavadinimo raktažodžius. Spustelėjus atidaroma CVP IS paieška naujame skirtuke.</p>
+            <div id="genCvpisLinks" class="mt-2"></div>
+          </div>
+
+          <div class="card mt-3">
+            <h3 class="card-title">Įklijuoti analogiškas specifikacijas (neprivaloma)</h3>
+            <p class="card-subtitle">Įklijuokite vieno ar kelių analogiškų pirkimų specifikacijų fragmentus. AI panaudos juos kaip atskaitos tašką (nekopijuojant — tik praplėtimui ir prevencijai pasikartoti tipinėms klaidoms).</p>
+
+            <div id="genReferences" class="mt-2"></div>
+
+            <button class="btn btn-secondary mt-2" onclick="App.addReference()">
+              <svg class="ico" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Pridėti analogą
+            </button>
+          </div>
+
+          <div class="wizard-footer">
+            <button class="btn btn-secondary" onclick="App.goToStep(2)">
+              <svg class="ico" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+              Atgal
+            </button>
+            <button class="btn btn-primary" onclick="App.runFullGeneration()">
+              Generuoti TS
+              <svg class="ico" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 4: FULL GENERATION -->
+        <div class="wizard-step" data-wizard-step="4">
+          <div class="step-header">
+            <h2>4. Sugeneruota techninė specifikacija</h2>
+            <p>AI sintezavo TS pagal jūsų atsakymus, žinių bazę ir PĮ reikalavimus. Galite redaguoti ir paleisti analizę.</p>
+          </div>
+
+          <div id="genFullLoading" class="card">
+            <div class="empty-state">
+              <div class="spinner spinner-lg"></div>
+              <h3 class="mt-2">Generuojama TS...</h3>
+              <p>AI rengia struktūrizuotą TS su techniniais reikalavimais, vertinimo kriterijais, garantijos sąlygomis ir atitikties lentele. Tai gali užtrukti 30-60 sek.</p>
+              <div class="progress-track mt-2"><div class="progress-fill" id="genProgressBar"></div></div>
+              <div id="genProgressLabel" class="form-help">Ruošiamasi...</div>
+            </div>
+          </div>
+
+          <div id="genResultPanel" class="hidden">
+            <div class="grid grid-sidebar">
+              <div>
+                <div class="card mb-3">
+                  <div class="card-header">
+                    <h3 class="card-title">Pagrindinė TS</h3>
+                    <div class="flex flex-gap-1">
+                      <button class="btn btn-secondary btn-sm" onclick="App.editGenerated()">
+                        <svg class="ico" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        Redaguoti
+                      </button>
+                      <button class="btn btn-secondary btn-sm" onclick="App.regenerateTs()">
+                        <svg class="ico" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                        Pergeneruoti
+                      </button>
+                    </div>
+                  </div>
+                  <div id="genTsPreview" class="gen-preview mt-2"></div>
+                </div>
+
+                <div class="card mb-3">
+                  <h3 class="card-title">Priedas Nr. 1 — Atitikties lentelė</h3>
+                  <p class="card-subtitle">Tiekėjas privalo pateikti pažymėtą atitikimą kiekvienam reikalavimui ir nurodyti įrodymą.</p>
+                  <div id="genCompliancePreview" class="compliance-preview mt-2"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="card mb-2">
+                  <h3 class="card-title">
+                    <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    Kainos vertinimas
+                  </h3>
+                  <div id="genPriceCard"></div>
+                </div>
+
+                <div class="card mt-2">
+                  <h3 class="card-title">Sugeneruoti raktiniai elementai</h3>
+                  <div id="genKeyElements"></div>
+                </div>
+
+                <div class="card mt-2">
+                  <h3 class="card-title">Rekomendacijos</h3>
+                  <div id="genRecommendations" class="card-subtitle"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="wizard-footer">
+            <button class="btn btn-secondary" onclick="App.goToStep(3)">
+              <svg class="ico" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+              Atgal
+            </button>
+            <div class="flex flex-gap-1">
+              <button class="btn btn-secondary" onclick="App.sendToAnalysis()" id="btnSendToAnalysis" disabled>
+                <svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                Tikrinti taisyklėmis
+              </button>
+              <button class="btn btn-primary" onclick="App.goToStep(5)" id="btnGoToExport" disabled>
+                Toliau: Eksportas
+                <svg class="ico" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 5: EXPORT -->
+        <div class="wizard-step" data-wizard-step="5">
+          <div class="step-header">
+            <h2>5. Eksportas ir tolimesni veiksmai</h2>
+            <p>TS paruošta naudoti. Eksportuokite DOCX formatu, atlikite kokybės patikrą arba siųskite į vidinį derinimą.</p>
+          </div>
+
+          <div class="grid grid-3">
+            <div class="card">
+              <h3 class="card-title">
+                <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                DOCX (Word)
+              </h3>
+              <p class="card-subtitle">Pilnas TS su antraštėmis, atitikties lentele kaip priedu, EPSO-G stiliumi.</p>
+              <button class="btn btn-primary btn-block mt-2" onclick="App.exportGeneratedDocx()">
+                <svg class="ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Atsisiųsti .docx
+              </button>
+            </div>
+
+            <div class="card">
+              <h3 class="card-title">
+                <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                Atlikti analizę
+              </h3>
+              <p class="card-subtitle">Pertikrinti sugeneruotą TS dviejų sluoksnių analize (taisyklės + AI).</p>
+              <button class="btn btn-secondary btn-block mt-2" onclick="App.sendToFullAnalysis()">
+                <svg class="ico" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Pradėti analizę
+              </button>
+            </div>
+
+            <div class="card">
+              <h3 class="card-title">
+                <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Tarpiniai formatai
+              </h3>
+              <p class="card-subtitle">Markdown, HTML, paprastas tekstas.</p>
+              <div class="flex flex-gap-1 mt-2">
+                <button class="btn btn-secondary btn-sm" onclick="App.exportGeneratedMd()">.md</button>
+                <button class="btn btn-secondary btn-sm" onclick="App.exportGeneratedTxt()">.txt</button>
+                <button class="btn btn-secondary btn-sm" onclick="App.exportGeneratedHtml()">.html</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card mt-3">
+            <h3 class="card-title">Galutinis TS turinys</h3>
+            <div id="genFinalPreview" class="gen-preview mt-2"></div>
+          </div>
+
+          <div class="wizard-footer">
+            <button class="btn btn-secondary" onclick="App.goToStep(4)">
+              <svg class="ico" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+              Atgal į generavimą
+            </button>
+            <button class="btn btn-primary" onclick="App.startNewGeneration()">
+              <svg class="ico" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Naujas pirkimas
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="input">
         <div class="hero">
           <div class="hero-content">
             <h2>Parenkite <span class="accent">aiškią, teisėtą ir konkurencingą</span> techninę specifikaciją</h2>
@@ -2394,6 +3139,416 @@ const App = (() => {
     $('#knowledgeBase').innerHTML = html;
   }
 
+  // ===========================================================
+  // WIZARD / GENERATION
+  // ===========================================================
+
+  const gen = {
+    step: 1,
+    meta: {},
+    questions: [],
+    answers: [],
+    references: [],
+    ts: null,
+    priceData: null,
+    cvpisLinks: [],
+    extraContext: null,
+  };
+
+  function gatherGenMeta() {
+    return {
+      title: $('#genTitle').value.trim(),
+      type: $('#genType').value,
+      cpv: $('#genCpv').value.trim(),
+      purpose: $('#genPurpose').value.trim(),
+      quantity: $('#genQuantity').value.trim(),
+      unit: $('#genUnit').value.trim(),
+      duration: parseInt($('#genDuration').value) || null,
+      deadline: $('#genDeadline').value.trim(),
+      location: $('#genLocation').value.trim(),
+      budget: parseFloat($('#genBudget').value) || null,
+      criteria: $('#genCriteria').value,
+      special: $('#genSpecial').value.trim(),
+      flags: {
+        green: $('#genFlagGreen').checked,
+        innovation: $('#genFlagInnovation').checked,
+        critical: $('#genFlagCritical').checked,
+        parts: $('#genFlagParts').checked,
+      }
+    };
+  }
+
+  function goToStep(n) {
+    if (n < 1 || n > 5) return;
+    gen.step = n;
+    $$('.wizard-step').forEach(s => s.classList.toggle('active', parseInt(s.dataset.wizardStep) === n));
+    $$('.stepper-step').forEach((s, idx) => {
+      const stepNum = parseInt(s.dataset.step);
+      s.classList.toggle('active', stepNum === n);
+      s.classList.toggle('completed', stepNum < n);
+    });
+  }
+
+  async function startGeneration() {
+    const meta = gatherGenMeta();
+    if (!meta.title || meta.title.length < 5) {
+      toast('Įveskite pirkimo pavadinimą (min. 5 simboliai).', 'error');
+      return;
+    }
+    if (!state.settings.apiKey) {
+      toast('Nenustatytas API raktas. Atidarau nustatymus.', 'error');
+      openSettings();
+      return;
+    }
+    gen.meta = meta;
+    goToStep(2);
+    $('#genQuestionsLoading').classList.remove('hidden');
+    $('#genQuestionsList').classList.add('hidden');
+    try {
+      const result = await TSGenerator.generateQuestions(meta, state.settings, () => {});
+      gen.questions = result.questions || [];
+      gen.cvpisLinks = TSGenerator.buildCvpisSearchUrls(result.cvpisSearchKeywords || [meta.title]);
+      gen.extraContext = { cpvSuggestions: result.cpvSuggestions, marketContext: result.marketContext };
+      renderQuestions();
+      renderCvpisLinks();
+      $('#genQuestionsLoading').classList.add('hidden');
+      $('#genQuestionsList').classList.remove('hidden');
+      $('#btnQuestionsNext').disabled = false;
+    } catch (err) {
+      console.error(err);
+      toast('Klaida generuojant klausimus: ' + err.message, 'error');
+      $('#genQuestionsLoading').classList.add('hidden');
+    }
+  }
+
+  function renderQuestions() {
+    const sortedQ = [...gen.questions].sort((a, b) => (b.critical ? 1 : 0) - (a.critical ? 1 : 0));
+    let html = '';
+    if (gen.extraContext?.marketContext) {
+      html += `<div class="alert alert-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><div><strong>Rinkos kontekstas:</strong><br/>${escapeHtml(gen.extraContext.marketContext)}</div></div>`;
+    }
+    if (gen.extraContext?.cpvSuggestions?.length && !gen.meta.cpv) {
+      html += `<div class="alert alert-success mt-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><div><strong>Siūlomi CPV kodai:</strong> ${gen.extraContext.cpvSuggestions.map(c => `<span class="tag-chip">${escapeHtml(c)}</span>`).join(' ')}</div></div>`;
+    }
+    html += sortedQ.map((q, idx) => `
+      <div class="qa-card ${q.critical ? 'critical' : ''}" id="qa-${q.id}">
+        <div class="qa-question">
+          <span class="qa-question-num">${idx + 1}</span>
+          <div>
+            <div class="qa-question-text">${escapeHtml(q.question)} ${q.critical ? '<span class="badge badge-error">Kritinis</span>' : ''} <span class="badge badge-neutral">${escapeHtml(q.category)}</span></div>
+            ${q.hint ? `<div class="qa-question-hint">💡 ${escapeHtml(q.hint)}</div>` : ''}
+          </div>
+        </div>
+        <textarea class="form-textarea" style="min-height:60px;" id="ans-${q.id}" placeholder="Jūsų atsakymas... (galite palikti tuščią)" oninput="App.markAnswered('${q.id}')"></textarea>
+        ${(q.suggestedAnswers && q.suggestedAnswers.length) ? `<div class="mt-1" style="font-size: 12px; color: var(--color-graphite-50);">Pasiūlymai: ${q.suggestedAnswers.map(s => `<button type="button" class="badge badge-info" style="border:none;cursor:pointer;margin:2px;" onclick="App.useSuggestion('${q.id}', this)" data-value="${escapeHtml(s)}">${escapeHtml(s)}</button>`).join(' ')}</div>` : ''}
+      </div>
+    `).join('');
+    $('#genQuestionsList').innerHTML = html;
+  }
+
+  function markAnswered(qId) {
+    const card = $('#qa-' + qId);
+    const txt = $('#ans-' + qId).value.trim();
+    if (txt) card.classList.add('answered');
+    else card.classList.remove('answered');
+  }
+
+  function useSuggestion(qId, btn) {
+    const txt = btn.getAttribute('data-value');
+    const ta = $('#ans-' + qId);
+    ta.value = (ta.value ? ta.value + '; ' : '') + txt;
+    markAnswered(qId);
+  }
+
+  function gatherAnswers() {
+    return gen.questions.map(q => ({
+      id: q.id,
+      question: q.question,
+      answer: $('#ans-' + q.id)?.value.trim() || ''
+    }));
+  }
+
+  function renderCvpisLinks() {
+    const html = gen.cvpisLinks.map(l => `
+      <div class="flex flex-between" style="background: var(--color-graphite-5); border-radius: 8px; padding: 10px 14px; margin-bottom: 6px;">
+        <div>
+          <strong style="font-size: 13px;">${escapeHtml(l.keyword)}</strong>
+          <div style="font-size: 11px; color: var(--color-graphite-50); word-break: break-all;">${escapeHtml(l.url)}</div>
+        </div>
+        <a href="${l.url}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Atidaryti
+        </a>
+      </div>
+    `).join('');
+    $('#genCvpisLinks').innerHTML = html;
+  }
+
+  function addReference() {
+    gen.references.push({ label: '', text: '' });
+    renderReferences();
+  }
+
+  function removeReference(idx) {
+    gen.references.splice(idx, 1);
+    renderReferences();
+  }
+
+  function updateReference(idx, field, val) {
+    if (gen.references[idx]) gen.references[idx][field] = val;
+  }
+
+  function renderReferences() {
+    if (!gen.references.length) {
+      $('#genReferences').innerHTML = '<p class="card-subtitle" style="font-style: italic;">Nepridėta nė vieno analogo. Tai neprivaloma — galite tęsti ir be jų.</p>';
+      return;
+    }
+    $('#genReferences').innerHTML = gen.references.map((r, idx) => `
+      <div class="ref-sample">
+        <div class="ref-sample-header flex flex-between">
+          <input type="text" class="form-input" style="font-weight: 700; max-width: 60%;" placeholder="Analogo pavadinimas / šaltinis (pvz., CVP IS 2024/01234)" value="${escapeHtml(r.label || '')}" oninput="App.updateReference(${idx}, 'label', this.value)" />
+          <button class="btn btn-danger btn-sm" onclick="App.removeReference(${idx})">
+            <svg class="ico" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+            Pašalinti
+          </button>
+        </div>
+        <textarea class="form-textarea mt-1" style="min-height: 80px;" placeholder="Įklijuokite analogiško pirkimo TS fragmentą..." oninput="App.updateReference(${idx}, 'text', this.value)">${escapeHtml(r.text || '')}</textarea>
+      </div>
+    `).join('');
+  }
+
+  async function runFullGeneration() {
+    if (!state.settings.apiKey) { toast('Nenustatytas API raktas.', 'error'); openSettings(); return; }
+    goToStep(4);
+    gen.answers = gatherAnswers();
+    $('#genFullLoading').classList.remove('hidden');
+    $('#genResultPanel').classList.add('hidden');
+
+    const setGenProgress = (label, pct) => {
+      $('#genProgressBar').style.width = pct + '%';
+      $('#genProgressLabel').textContent = label;
+    };
+
+    setGenProgress('Generuojama TS turinio struktūra...', 10);
+    try {
+      // Generate TS and Price in parallel for speed
+      const [ts, priceData] = await Promise.all([
+        TSGenerator.generateFullTs(gen.meta, gen.answers, gen.references, state.settings, setGenProgress)
+          .catch(err => { console.error('TS gen err:', err); throw err; }),
+        PriceEstimator.estimate(gen.meta, gen.answers, state.settings, () => {})
+          .catch(err => { console.warn('Price err:', err); return null; })
+      ]);
+      gen.ts = ts;
+      gen.priceData = priceData;
+
+      setGenProgress('Ruošiama peržiūra...', 95);
+      renderGeneratedTs();
+      renderCompliance();
+      renderPriceCard();
+      renderKeyElements();
+      renderGenRecommendations();
+
+      $('#genFullLoading').classList.add('hidden');
+      $('#genResultPanel').classList.remove('hidden');
+      $('#btnGoToExport').disabled = false;
+      $('#btnSendToAnalysis').disabled = false;
+      renderFinalPreview();
+      toast('TS sugeneruota!', 'success');
+    } catch (err) {
+      console.error(err);
+      toast('Klaida generuojant TS: ' + err.message, 'error');
+      $('#genFullLoading').classList.add('hidden');
+    }
+  }
+
+  function renderGeneratedTs() {
+    const html = DocxBuilder.mdToHtml((gen.ts.sections || []).map(s => `## ${s.number}. ${s.title}\n\n${s.content}`).join('\n\n'));
+    $('#genTsPreview').innerHTML = `<h1>${escapeHtml(gen.ts.title || gen.meta.title)}</h1>` + html;
+  }
+
+  function renderCompliance() {
+    const items = gen.ts.complianceTable || [];
+    if (!items.length) {
+      $('#genCompliancePreview').innerHTML = '<p class="card-subtitle"><em>Atitikties lentelė nesugeneruota.</em></p>';
+      return;
+    }
+    $('#genCompliancePreview').innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>TS p.</th>
+            <th>Reikalavimas</th>
+            <th>Kategorija</th>
+            <th>Tiekėjo siūlymas</th>
+            <th>Įrodymas</th>
+            <th>Atitinka</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${items.slice(0, 15).map(it => `
+            <tr>
+              <td>${escapeHtml(it.ref || '')}</td>
+              <td>${escapeHtml(it.requirement || '')}</td>
+              <td><span class="badge badge-neutral">${escapeHtml(it.category || '')}</span></td>
+              <td><em>(pildys tiekėjas)</em></td>
+              <td><em>(pildys tiekėjas)</em></td>
+              <td><em>—</em></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      ${items.length > 15 ? `<p class="card-subtitle mt-1">…ir dar ${items.length - 15} eilučių. Visa lentelė bus DOCX faile.</p>` : ''}
+    `;
+  }
+
+  function renderPriceCard() {
+    if (!gen.priceData) {
+      $('#genPriceCard').innerHTML = '<p class="card-subtitle"><em>Kainos vertinimas nesugeneruotas.</em></p>';
+      return;
+    }
+    const p = gen.priceData;
+    const fmt = n => n == null ? '—' : Number(n).toLocaleString('lt-LT', { maximumFractionDigits: 0 });
+    const e = p.estimate || {};
+    const confLbl = { high: 'Aukštas', medium: 'Vidutinis', low: 'Žemas' }[e.confidence] || '—';
+    $('#genPriceCard').innerHTML = `
+      <div class="price-display">
+        <div class="price-label">Numatoma vertė (be PVM)</div>
+        <div class="price-value">${fmt(e.central)} EUR</div>
+        <div class="price-range">Rėžis: ${fmt(e.min)} – ${fmt(e.max)} EUR</div>
+        ${e.perUnit ? `<div class="price-range" style="margin-top:4px;">Vieneto kaina: ${fmt(e.perUnit)} EUR</div>` : ''}
+      </div>
+      <p class="mt-2" style="font-size: 13px;">${escapeHtml(p.rationale || '')}</p>
+      <div class="mt-2">
+        <strong style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-graphite-50);">Patikimumas:</strong>
+        <span class="badge badge-${e.confidence === 'high' ? 'success' : e.confidence === 'medium' ? 'warning' : 'error'}">${confLbl}</span>
+      </div>
+
+      ${p.sources?.length ? `
+      <details class="mt-2">
+        <summary>Šaltiniai (${p.sources.length})</summary>
+        <ul class="price-source-list mt-1">
+          ${p.sources.map(s => `<li class="price-source-item"><span class="price-source-icon">📊</span><div><strong>${escapeHtml(s.title)}</strong><br/>${escapeHtml(s.description)}</div></li>`).join('')}
+        </ul>
+      </details>` : ''}
+
+      ${p.priceFactors ? `
+      <details class="mt-2">
+        <summary>Kainos veiksniai</summary>
+        <div class="mt-1">
+          <strong style="font-size: 12px; color: var(--color-error);">↑ Didina:</strong>
+          <ul style="font-size: 13px; margin: 4px 0 12px;">${(p.priceFactors.increase || []).map(f => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
+          <strong style="font-size: 12px; color: var(--color-emerald);">↓ Mažina:</strong>
+          <ul style="font-size: 13px; margin: 4px 0;">${(p.priceFactors.decrease || []).map(f => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
+        </div>
+      </details>` : ''}
+
+      ${p.marketRisks?.length ? `
+      <details class="mt-2">
+        <summary>Rinkos rizikos (${p.marketRisks.length})</summary>
+        <ul style="font-size: 13px; margin-top: 8px;">${p.marketRisks.map(r => `<li>${escapeHtml(r)}</li>`).join('')}</ul>
+      </details>` : ''}
+    `;
+  }
+
+  function renderKeyElements() {
+    const k = gen.ts.keyElements || {};
+    $('#genKeyElements').innerHTML = `
+      <table class="data-table" style="font-size: 13px;">
+        <tbody>
+          ${k.cpv ? `<tr><td><strong>CPV</strong></td><td>${escapeHtml(k.cpv)}</td></tr>` : ''}
+          ${k.additionalCpv?.length ? `<tr><td><strong>Papildomi CPV</strong></td><td>${k.additionalCpv.map(c => '<span class="tag-chip">' + escapeHtml(c) + '</span>').join(' ')}</td></tr>` : ''}
+          ${k.standards?.length ? `<tr><td><strong>Standartai</strong></td><td>${k.standards.map(s => '<span class="tag-chip">' + escapeHtml(s) + '</span>').join(' ')}</td></tr>` : ''}
+          ${k.warranty ? `<tr><td><strong>Garantija</strong></td><td>${escapeHtml(k.warranty)}</td></tr>` : ''}
+          ${k.penalty ? `<tr><td><strong>Delspinigiai</strong></td><td>${escapeHtml(k.penalty)}</td></tr>` : ''}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function renderGenRecommendations() {
+    const recs = gen.ts.recommendations || [];
+    if (!recs.length) {
+      $('#genRecommendations').innerHTML = '<p><em>Nėra papildomų rekomendacijų.</em></p>';
+      return;
+    }
+    $('#genRecommendations').innerHTML = '<ul style="padding-left: 16px; margin: 0;">' + recs.map(r => `<li style="margin-bottom: 6px;">${escapeHtml(r)}</li>`).join('') + '</ul>';
+  }
+
+  function renderFinalPreview() {
+    if (!gen.ts) return;
+    const md = TSGenerator.tsToMarkdown(gen.ts);
+    $('#genFinalPreview').innerHTML = DocxBuilder.mdToHtml(md);
+  }
+
+  function editGenerated() {
+    if (!gen.ts) return;
+    const md = TSGenerator.tsToMarkdown(gen.ts);
+    // Send to "Tikrinti TS" tab for editing/checking
+    $('#specText').value = md;
+    state.spec = md;
+    updateStats();
+    $('#metaTitle').value = gen.meta.title || '';
+    $('#metaType').value = gen.meta.type || 'goods';
+    $('#metaCpv').value = gen.meta.cpv || '';
+    $('#metaDescription').value = gen.meta.purpose || '';
+    if (gen.meta.budget) $('#metaValue').value = gen.meta.budget;
+    if (gen.priceData?.estimate?.central) $('#metaValue').value = Math.round(gen.priceData.estimate.central);
+    switchTab('input');
+    toast('Tekstas perkeltas į „Tikrinti TS" skirtuką.', 'success');
+  }
+
+  async function regenerateTs() {
+    if (!confirm('Pergeneruoti TS? Esamas turinys bus pakeistas.')) return;
+    await runFullGeneration();
+  }
+
+  async function sendToAnalysis() {
+    if (!gen.ts) return;
+    editGenerated();
+    setTimeout(() => runRulesOnly(), 500);
+  }
+
+  async function sendToFullAnalysis() {
+    if (!gen.ts) return;
+    editGenerated();
+    setTimeout(() => runAnalysis(), 500);
+  }
+
+  function exportGeneratedDocx() {
+    if (!gen.ts) return toast('Pirmiausia sugeneruokite TS.', 'error');
+    const html = DocxBuilder.buildTsDocx(gen.ts, gen.meta, gen.priceData);
+    const safeTitle = (gen.meta.title || 'TS').replace(/[^a-zA-Z0-9_Ā-ſ\s]/g, '').slice(0, 60).trim().replace(/\s+/g, '_');
+    DocxBuilder.download(html, `${safeTitle}_${Date.now()}.doc`);
+    toast('DOCX failas atsisiunčiamas...', 'success');
+  }
+
+  function exportGeneratedMd() {
+    if (!gen.ts) return;
+    const md = TSGenerator.tsToMarkdown(gen.ts);
+    downloadBlob(md, 'TS_' + Date.now() + '.md', 'text/markdown');
+  }
+
+  function exportGeneratedTxt() {
+    if (!gen.ts) return;
+    const md = TSGenerator.tsToMarkdown(gen.ts);
+    const txt = md.replace(/[#*_`]/g, '');
+    downloadBlob(txt, 'TS_' + Date.now() + '.txt', 'text/plain');
+  }
+
+  function exportGeneratedHtml() {
+    if (!gen.ts) return;
+    const html = DocxBuilder.buildTsDocx(gen.ts, gen.meta, gen.priceData);
+    downloadBlob(html, 'TS_' + Date.now() + '.html', 'text/html');
+  }
+
+  function startNewGeneration() {
+    if (!confirm('Pradėti naują generavimą? Esami duomenys bus išvalyti.')) return;
+    ['genTitle', 'genCpv', 'genPurpose', 'genQuantity', 'genUnit', 'genDuration', 'genDeadline', 'genLocation', 'genBudget', 'genSpecial'].forEach(id => $('#' + id).value = '');
+    gen.meta = {}; gen.questions = []; gen.answers = []; gen.references = []; gen.ts = null; gen.priceData = null; gen.cvpisLinks = [];
+    goToStep(1);
+    toast('Pradedamas naujas pirkimas.', 'info');
+  }
+
   // === EXPORT ===
   return {
     init,
@@ -2403,6 +3558,14 @@ const App = (() => {
     showIssueDetail, closeIssueModal,
     filterCategory,
     exportHtml, exportDocx,
+    // Wizard
+    goToStep, startGeneration, runFullGeneration,
+    markAnswered, useSuggestion,
+    addReference, removeReference, updateReference,
+    editGenerated, regenerateTs,
+    sendToAnalysis, sendToFullAnalysis,
+    exportGeneratedDocx, exportGeneratedMd, exportGeneratedTxt, exportGeneratedHtml,
+    startNewGeneration,
   };
 })();
 
@@ -3154,11 +4317,645 @@ Atlik specifikacijos analizę pagal sistemos prompt'e nurodytas kryptis ir grą�
   return { analyze };
 })();
 
+// ---------- TS GENERATOR (AI sintezės modulis) ----------
+const TSGenerator = (() => {
+
+  const GENERATION_SYSTEM_PROMPT = `Tu esi vyriausiasis Litgrid AB pirkimų metodininkas, ekspertas Lietuvos viešųjų pirkimų teisės ir techninių specifikacijų rengimo srityje, su 15+ metų patirtimi rengiant TS energetikos sektoriaus pirkimams.
+
+KONTEKSTAS:
+- LITGRID AB — Lietuvos elektros perdavimo sistemos operatorius (TSO)
+- Perkantysis subjektas pagal PĮ (LR Pirkimų, atliekamų vandentvarkos, energetikos, transporto ar pašto paslaugų srities perkančiųjų subjektų įstatymą)
+- Taikoma ES Direktyva 2014/25/ES
+- Kritinė infrastruktūra — saugumo reikalavimai ypatingai svarbūs
+- Pagrindinė priežiūros institucija: Viešųjų pirkimų tarnyba (VPT)
+
+TAVO MISIJA:
+Generuoti aukščiausios kokybės techninę specifikaciją, kuri:
+1. Visiškai atitinka PĮ reikalavimus (ypač 28, 30, 33, 35, 47, 55, 89 straipsniai)
+2. Skatina konkurenciją (3+ tiekėjai gali pateikti pasiūlymus)
+3. Aiškiai, nedviprasmiškai, profesionaliai išreikšta
+4. Naudoja matuojamus parametrus ir nuorodas į standartus (ISO, IEC, EN, LST EN)
+5. Tinka energetikos sektoriaus kritinei infrastruktūrai
+6. NIEKADA neturi prekės ženklų be „arba lygiavertis"
+7. NIEKADA nenaudoja subjektyvių sąvokų be matuojamų kriterijų
+
+TS STRUKTŪROS PAGRINDAS (visada laikytis):
+1. Bendrosios nuostatos (terminija, taikomi teisės aktai)
+2. Pirkimo objekto aprašymas (kas, kiek, kokios apimtys)
+3. Funkciniai reikalavimai (ką sprendimas turi daryti)
+4. Techniniai reikalavimai (techniniai parametrai)
+5. Kokybės reikalavimai (standartai, sertifikatai, bandymai)
+6. Pristatymo / atlikimo terminai ir vieta
+7. Garantijos sąlygos
+8. Sutarties vykdymo užtikrinimo priemonės (delspinigiai, baudos)
+9. Reikalavimai tiekėjui (kvalifikaciniai)
+10. Pasiūlymų vertinimo kriterijai
+11. Atitikties lentelės pildymo nurodymai (Priedas Nr. 1)
+
+DAŽNIAUSIOS KLAIDOS, KURIŲ VENGTI:
+- Konkretūs prekės ženklai be „arba lygiavertis" (PĮ 33 str. 4 d.)
+- Subjektyvūs terminai („kokybiškas", „patikimas", „aukštos kokybės")
+- Per dideli kvalifikaciniai reikalavimai (Metodikos koeficientai: didelės vertės 0,3; vidutinės 0,5; mažos 0,7)
+- Konkretus specialistų skaičius (geriau kompetencijos)
+- Magistro/daktaro reikalavimas be pagrindimo
+- Subjektyvūs vertinimo kriterijai
+- Neaiškūs kiekiai („pakankamas kiekis", „prireikus")`;
+
+  async function generateQuestions(meta, settings, onProgress) {
+    const userMsg = `Pirkimo pirminė informacija:
+- Pavadinimas: ${meta.title || '(nenurodyta)'}
+- Objekto tipas: ${meta.type}
+- CPV: ${meta.cpv || '(nenurodyta)'}
+- Paskirtis: ${meta.purpose || '(nenurodyta)'}
+- Kiekis: ${meta.quantity || '(nenurodyta)'} ${meta.unit || ''}
+- Trukmė: ${meta.duration || '(nenurodyta)'} mėn.
+- Pristatymo terminas: ${meta.deadline || '(nenurodyta)'}
+- Vieta: ${meta.location || '(nenurodyta)'}
+- Numatoma vertė: ${meta.budget ? meta.budget + ' EUR' : '(nenurodyta)'}
+- Vertinimo kriterijus: ${meta.criteria || '(AI parinks)'}
+- Specialūs reikalavimai: ${meta.special || '(nenurodyta)'}
+- Aspektai: ${Object.entries(meta.flags || {}).filter(([_, v]) => v).map(([k]) => k).join(', ') || 'nėra'}
+
+UŽDUOTIS:
+Sugeneruok 6-10 STRATEGIŠKAI svarbiausių klausimų, kurie padės pateikti tikrai aukštos kokybės techninę specifikaciją. Klausimai turi būti:
+- Konkretūs ir veiksmingi (ne abstraktūs)
+- Pritaikyti šiam KONKREČIAM pirkimo objektui (NE bendrai)
+- Sutelkti į parametrus, kurie skiria gerą TS nuo prastos
+- Įvairios kategorijos (techniniai, kokybės, atlikimo, garantijos)
+- Pažymėti, kurie yra kritiniai (privalomi atsakymui)
+
+GRĄŽINK TIK VALID JSON (be markdown):
+{
+  "questions": [
+    {
+      "id": "q1",
+      "question": "Klausimo tekstas?",
+      "hint": "Trumpas patarimas, kaip atsakyti, kokie parametrai įprasti šiam objektui",
+      "category": "techniniai|kokybės|atlikimas|garantija|saugumas|kvalifikacija|kita",
+      "critical": true|false,
+      "suggestedAnswers": ["jeigu turi konkrečių pasiūlymų — pateik 2-4"]
+    }
+  ],
+  "cpvSuggestions": ["jei nepateiktas CPV — pasiūlyk 1-3 tinkamiausius CPV kodus su pavadinimais"],
+  "marketContext": "Trumpa pastaba apie rinkos kontekstą šiam pirkimui (3-5 sakiniai)",
+  "cvpisSearchKeywords": ["raktažodis1", "raktažodis2", "..."]
+}`;
+
+    onProgress?.('Generuojami klausimai...', 30);
+    const content = await callClaude(userMsg, settings, 4000);
+    return parseJson(content);
+  }
+
+  async function generateFullTs(meta, answers, references, settings, onProgress) {
+    const answersBlock = (answers || []).map((a, i) => `Q${i+1}: ${a.question}\nA${i+1}: ${a.answer || '(praleista)'}`).join('\n\n');
+    const refsBlock = (references || []).filter(r => r.text && r.text.trim()).map((r, i) => `--- Analogas ${i+1} (${r.label || 'be pavadinimo'}) ---\n${r.text.slice(0, 4000)}\n--- pabaiga ---`).join('\n\n');
+
+    const userMsg = `Pirkimo pirminė informacija:
+- Pavadinimas: ${meta.title}
+- Objekto tipas: ${meta.type}
+- CPV: ${meta.cpv || '(nenurodyta)'}
+- Paskirtis: ${meta.purpose || '(nenurodyta)'}
+- Kiekis: ${meta.quantity || '(nenurodyta)'} ${meta.unit || ''}
+- Trukmė: ${meta.duration || '(nenurodyta)'} mėn.
+- Pristatymo terminas: ${meta.deadline || '(nenurodyta)'}
+- Vieta: ${meta.location || '(nenurodyta)'}
+- Numatoma vertė: ${meta.budget ? meta.budget + ' EUR' : '(nenurodyta)'}
+- Vertinimo kriterijus: ${meta.criteria || '(AI parinks)'}
+- Specialūs reikalavimai: ${meta.special || '(nenurodyta)'}
+
+VARTOTOJO ATSAKYMAI Į PATIKSLINIMO KLAUSIMUS:
+${answersBlock || '(praleisti)'}
+
+${refsBlock ? 'ANALOGIŠKŲ PIRKIMŲ TS FRAGMENTAI (naudoti tik kaip kontekstą — NIEKADA nekopijuoti tiesiogiai):\n' + refsBlock : ''}
+
+UŽDUOTIS:
+Sugeneruok PILNĄ profesionalią techninę specifikaciją. Reikalavimai:
+1. Naudok aiškią numeruotą struktūrą (1., 1.1., 1.1.1.)
+2. Kiekvienas reikalavimas turi turėti unikalų numerį (būsim naudojami atitikties lentelėje)
+3. Naudok matuojamus parametrus (ne „aukštos kokybės", o „atitinkantis ISO 9001")
+4. Įtrauk nuorodas į standartus (ISO/IEC/EN/LST EN)
+5. Numatyk garantijos sąlygas, delspinigius, sutarties vykdymo užtikrinimą
+6. Atitik PĮ 33, 35, 47, 55 straipsnius
+7. Pridėk pasiūlymų vertinimo metodiką su tiksliais balais
+8. Jeigu reikia nurodyti prekės ženklą — visada pridedi „arba lygiavertis"
+
+ATITIKTIES LENTELĖ:
+Iš sugeneruotos TS automatiškai sukurk Priedo Nr. 1 atitikties lentelę. Ji turi turėti:
+- Nr.: TS punkto numeris
+- Reikalavimas: aiški šio punkto santrauka
+- Tiekėjo siūlomas sprendimas: TUŠČIA (pildys tiekėjas)
+- Atitikimo įrodymas (dokumentas/punktas): TUŠČIA
+- Atitinka: TUŠČIA (Taip/Ne)
+
+GRĄŽINK TIK VALID JSON (be markdown), maždaug 4000-6000 žodžių TS:
+{
+  "title": "Galutinis TS pavadinimas",
+  "sections": [
+    {
+      "number": "1",
+      "title": "Bendrosios nuostatos",
+      "content": "Markdown formatuotas turinys su paragraphais, sąrašais, lentelėmis"
+    }
+  ],
+  "complianceTable": [
+    {
+      "ref": "3.1.1",
+      "requirement": "Sutrumpintas reikalavimo tekstas",
+      "category": "technical|quality|delivery|warranty|qualification|other"
+    }
+  ],
+  "evaluationCriteria": [
+    {
+      "name": "Kainos kriterijus",
+      "weight": 60,
+      "formula": "Bk = (Cmin/C) × 60",
+      "description": "Aprašymas, kaip skaičiuojami balai"
+    }
+  ],
+  "keyElements": {
+    "cpv": "siūlomas pagrindinis CPV kodas",
+    "additionalCpv": ["papildomi CPV kodai"],
+    "standards": ["ISO 9001", "IEC 62443-3-3 SL2", "..."],
+    "warranty": "Garantijos terminas ir aprėptis (1 sakinys)",
+    "penalty": "Delspinigių dydis (1 sakinys)"
+  },
+  "recommendations": ["1 rekomendacija dėl šio konkretaus pirkimo", "2 rekomendacija", "..."]
+}`;
+
+    onProgress?.('Generuojama pilna TS...', 50);
+    const content = await callClaude(userMsg, settings, 16000);
+    onProgress?.('Apdorojama...', 90);
+    return parseJson(content);
+  }
+
+  async function callClaude(userMessage, settings, maxTokens = 8000) {
+    const endpoint = settings.apiEndpoint || 'https://api.anthropic.com/v1/messages';
+    const body = {
+      model: settings.model || 'claude-sonnet-4-6',
+      max_tokens: maxTokens,
+      system: GENERATION_SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: userMessage }]
+    };
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': settings.apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`API klaida ${response.status}: ${errText.slice(0, 200)}`);
+    }
+    const data = await response.json();
+    return data.content?.[0]?.text || '';
+  }
+
+  function parseJson(content) {
+    let cleaned = content.trim();
+    cleaned = cleaned.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '');
+    const start = cleaned.indexOf('{');
+    const end = cleaned.lastIndexOf('}');
+    if (start >= 0 && end > start) cleaned = cleaned.slice(start, end + 1);
+    try {
+      return JSON.parse(cleaned);
+    } catch (e) {
+      console.error('JSON parse error:', e, cleaned.slice(0, 500));
+      throw new Error('AI atsakymas nėra validus JSON.');
+    }
+  }
+
+  // Build CVP IS search URLs (since direct scraping is blocked by CORS)
+  function buildCvpisSearchUrls(keywords) {
+    const baseSearch = 'https://cvpp.eviesiejipirkimai.lt/Notice/Search';
+    const urls = [];
+    (keywords || []).slice(0, 5).forEach(kw => {
+      urls.push({
+        keyword: kw,
+        url: `${baseSearch}?text=${encodeURIComponent(kw)}`,
+      });
+    });
+    // Also add general search
+    urls.push({
+      keyword: 'Bendra paieška',
+      url: 'https://cvpp.eviesiejipirkimai.lt/'
+    });
+    return urls;
+  }
+
+  // Convert structured TS to markdown
+  function tsToMarkdown(ts) {
+    if (!ts) return '';
+    let md = `# ${ts.title || 'Techninė specifikacija'}\n\n`;
+
+    (ts.sections || []).forEach(s => {
+      md += `## ${s.number}. ${s.title}\n\n${s.content}\n\n`;
+    });
+
+    if (ts.evaluationCriteria && ts.evaluationCriteria.length) {
+      md += `## Pasiūlymų vertinimo kriterijai\n\n`;
+      md += `| Kriterijus | Svoris | Formulė | Aprašymas |\n|---|---|---|---|\n`;
+      ts.evaluationCriteria.forEach(c => {
+        md += `| ${c.name} | ${c.weight} | \`${c.formula || ''}\` | ${c.description || ''} |\n`;
+      });
+      md += '\n';
+    }
+    return md;
+  }
+
+  return {
+    generateQuestions,
+    generateFullTs,
+    buildCvpisSearchUrls,
+    tsToMarkdown
+  };
+})();
+
+// ---------- PRICE ESTIMATOR ----------
+const PriceEstimator = (() => {
+
+  const PRICE_SYSTEM_PROMPT = `Tu esi vyriausiasis Litgrid AB rinkos analitikas, ekspertas energetikos sektoriaus pirkimų rinkos kainoms vertinti.
+
+ŽINIOS:
+- Lietuvos energetikos sektoriaus rinka
+- ES tiekėjų rinkos kainos
+- LITGRID, Ignitis, EPSO-G grupės pirkimų istorija (publikuoti rezultatai)
+- VPT, CVP IS paviešintos pirkimo sutartys
+- Gamintojų vidutinės kainos (Siemens, ABB, GE, Hitachi, Schneider, ir kt.)
+- ES nuolatinė statistinė informacija
+- Lietuvos infliacijos rodikliai ir energetikos sektoriaus tendencijos
+
+MISIJA:
+Įvertinti, kokia turėtų būti numatoma pirkimo vertė remiantis:
+- Pirkimo objekto pobūdžiu
+- Kiekiu ir apimtimi
+- Sutarties trukme
+- Specialiais reikalavimais (standartai, sertifikatai)
+- Rinkos kainomis 2025-2026 metais
+- Buvusių analogiškų pirkimų rezultatais
+
+NIEKADA NEMELUOK — jei trūksta informacijos, sakyk „nepakanka duomenų patikimam įvertinimui" ir pateik tik orientacinį rėžį su didele tolerancija.`;
+
+  async function estimate(meta, answers, settings, onProgress) {
+    const answersBlock = (answers || []).map((a, i) => `${a.question}: ${a.answer || '(praleista)'}`).join('\n');
+
+    const userMsg = `Įvertink šio pirkimo numatomą vertę:
+
+PIRKIMO INFORMACIJA:
+- Pavadinimas: ${meta.title}
+- Objekto tipas: ${meta.type}
+- CPV: ${meta.cpv || '(nenurodyta)'}
+- Paskirtis: ${meta.purpose || '(nenurodyta)'}
+- Kiekis: ${meta.quantity || '(nenurodyta)'} ${meta.unit || ''}
+- Trukmė: ${meta.duration || '(nenurodyta)'} mėn.
+- Pristatymo terminas: ${meta.deadline || '(nenurodyta)'}
+- Vieta: ${meta.location || '(nenurodyta)'}
+- Specialūs reikalavimai: ${meta.special || '(nenurodyta)'}
+
+PAPILDOMI ATSAKYMAI:
+${answersBlock || '(praleista)'}
+
+UŽDUOTIS:
+Pateik išsamų kainos vertinimą. GRĄŽINK TIK VALID JSON (be markdown):
+
+{
+  "estimate": {
+    "central": numatomos vertės EUR (be PVM),
+    "min": minimalus protingas rėžio dydis EUR,
+    "max": maksimalus protingas rėžio dydis EUR,
+    "currency": "EUR",
+    "perUnit": vienos vieneto kaina EUR jei taikoma (arba null),
+    "confidence": "high|medium|low"
+  },
+  "rationale": "2-4 sakiniai apie kaip įvertinta",
+  "sources": [
+    {
+      "type": "cvpis|manufacturer|industry|estimate",
+      "title": "Šaltinio pavadinimas",
+      "description": "Konkretus duomenų taškas (kainos, kontekstas)",
+      "weight": "high|medium|low"
+    }
+  ],
+  "priceFactors": {
+    "increase": ["veiksniai, kurie didina kainą", "..."],
+    "decrease": ["veiksniai, kurie mažina kainą", "..."]
+  },
+  "comparableProcurements": [
+    {
+      "description": "Tipinio panašaus pirkimo aprašymas (jei žinai)",
+      "year": "metai",
+      "value": "vertė EUR",
+      "source": "kur paviešinta"
+    }
+  ],
+  "recommendations": [
+    "konkreti rekomendacija dėl pirkimo strategijos (pvz., skaidyti į dalis, ilgesnis terminas, framework agreement, ir t.t.)"
+  ],
+  "marketRisks": [
+    "rinkos rizikos veiksniai (žaliavų kainos, geopolitika, ribotas tiekėjų skaičius, ir t.t.)"
+  ]
+}
+
+SVARBU: Visos kainos turi būti realistiškos. Energetikos sektoriaus pirkimams jos dažnai siekia šimtų tūkstančių ar milijonų EUR. Bet jei kalbam apie smulkų pirkimą (pvz., kanceliarija), nepadidink kainos.`;
+
+    onProgress?.('Vertinama rinkos kaina...', 50);
+    const content = await callClaude(userMsg, settings, 4000);
+    return parseJson(content);
+  }
+
+  async function callClaude(userMessage, settings, maxTokens = 4000) {
+    const endpoint = settings.apiEndpoint || 'https://api.anthropic.com/v1/messages';
+    const body = {
+      model: settings.model || 'claude-sonnet-4-6',
+      max_tokens: maxTokens,
+      system: PRICE_SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: userMessage }]
+    };
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': settings.apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`API klaida ${response.status}: ${errText.slice(0, 200)}`);
+    }
+    const data = await response.json();
+    return data.content?.[0]?.text || '';
+  }
+
+  function parseJson(content) {
+    let cleaned = content.trim();
+    cleaned = cleaned.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '');
+    const start = cleaned.indexOf('{');
+    const end = cleaned.lastIndexOf('}');
+    if (start >= 0 && end > start) cleaned = cleaned.slice(start, end + 1);
+    return JSON.parse(cleaned);
+  }
+
+  return { estimate };
+})();
+
+// ---------- DOCX BUILDER (paprastas HTML→DOC su MS Word suderinamumu) ----------
+const DocxBuilder = (() => {
+
+  function buildTsDocx(ts, meta, priceData) {
+    const date = new Date().toLocaleDateString('lt-LT');
+    const sections = (ts.sections || []).map(s => {
+      const content = mdToHtml(s.content);
+      return `<h2 style="color:#00A072; font-size:16pt; margin-top:24pt; margin-bottom:12pt; border-bottom: 1pt solid #00A072; padding-bottom: 4pt;">${escapeHtml(s.number)}. ${escapeHtml(s.title)}</h2>${content}`;
+    }).join('\n');
+
+    const compliance = buildComplianceTable(ts.complianceTable || []);
+    const evalCriteria = buildEvaluationTable(ts.evaluationCriteria || []);
+
+    const css = `
+@page WordSection1 { size: 8.27in 11.69in; margin: 1.0in 1.0in 1.0in 1.0in; mso-page-orientation: portrait; }
+div.WordSection1 { page: WordSection1; }
+body { font-family: 'Nunito Sans', Arial, sans-serif; font-size: 11pt; color: #2E3641; line-height: 1.4; }
+h1 { font-family: 'Nunito Sans', Arial, sans-serif; font-size: 22pt; color: #2E3641; text-align: center; }
+h2 { font-family: 'Nunito Sans', Arial, sans-serif; font-size: 16pt; color: #00A072; }
+h3 { font-family: 'Nunito Sans', Arial, sans-serif; font-size: 13pt; color: #2E3641; margin-top: 12pt; }
+p { margin: 6pt 0; }
+table { border-collapse: collapse; width: 100%; margin: 12pt 0; }
+th { background: #D7EEDB; border: 0.75pt solid #00A072; padding: 6pt 8pt; text-align: left; font-weight: bold; font-size: 10pt; }
+td { border: 0.75pt solid #C7CDD3; padding: 6pt 8pt; font-size: 10pt; vertical-align: top; }
+.cover { text-align: center; padding-top: 60pt; }
+.cover h1 { font-size: 26pt; }
+.cover .meta { font-size: 14pt; color: #737483; margin-top: 24pt; }
+.meta-table td { padding: 4pt 12pt; border: none; }
+.meta-table td:first-child { font-weight: bold; color: #737483; }
+.page-break { page-break-before: always; }
+ul, ol { margin: 6pt 0; padding-left: 24pt; }
+li { margin: 3pt 0; }
+.legend { background: #EFF9F1; border-left: 3pt solid #00A072; padding: 6pt 12pt; margin: 12pt 0; font-size: 10pt; }
+.footer { color: #737483; font-size: 9pt; text-align: center; margin-top: 36pt; }
+    `;
+
+    const priceBlock = priceData ? `
+<div class="page-break"></div>
+<h2>Numatoma pirkimo vertė</h2>
+<p>${escapeHtml(priceData.rationale || '')}</p>
+<table class="meta-table">
+  <tr><td>Centrinis įvertinimas</td><td><strong>${formatPrice(priceData.estimate?.central)} EUR (be PVM)</strong></td></tr>
+  <tr><td>Minimumas</td><td>${formatPrice(priceData.estimate?.min)} EUR</td></tr>
+  <tr><td>Maksimumas</td><td>${formatPrice(priceData.estimate?.max)} EUR</td></tr>
+  ${priceData.estimate?.perUnit ? `<tr><td>Vieneto kaina</td><td>${formatPrice(priceData.estimate.perUnit)} EUR</td></tr>` : ''}
+  <tr><td>Patikimumas</td><td>${escapeHtml({high:'Aukštas',medium:'Vidutinis',low:'Žemas'}[priceData.estimate?.confidence] || '')}</td></tr>
+</table>
+
+<h3>Šaltiniai</h3>
+<ul>${(priceData.sources || []).map(s => `<li><strong>${escapeHtml(s.title)}</strong> — ${escapeHtml(s.description)}</li>`).join('')}</ul>
+
+${priceData.priceFactors ? `
+<h3>Kainą didinantys veiksniai</h3>
+<ul>${(priceData.priceFactors.increase || []).map(f => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
+<h3>Kainą mažinantys veiksniai</h3>
+<ul>${(priceData.priceFactors.decrease || []).map(f => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
+` : ''}
+
+${priceData.marketRisks?.length ? `<h3>Rinkos rizikos</h3><ul>${priceData.marketRisks.map(r => `<li>${escapeHtml(r)}</li>`).join('')}</ul>` : ''}
+
+${priceData.recommendations?.length ? `<h3>Rekomendacijos</h3><ul>${priceData.recommendations.map(r => `<li>${escapeHtml(r)}</li>`).join('')}</ul>` : ''}
+` : '';
+
+    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="UTF-8">
+<title>${escapeHtml(meta.title || 'Techninė specifikacija')}</title>
+<style>${css}</style>
+<xml>
+<w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom><w:DoNotOptimizeForBrowser/></w:WordDocument>
+</xml>
+</head>
+<body>
+<div class="WordSection1">
+
+<div class="cover">
+  <p style="text-transform: uppercase; font-size: 11pt; color: #737483; letter-spacing: 2pt;">LITGRID AB</p>
+  <h1>${escapeHtml(ts.title || meta.title || 'Techninė specifikacija')}</h1>
+  <div class="meta">
+    <p>Pirkimo techninė specifikacija</p>
+    <p>${escapeHtml(meta.cpv ? 'CPV: ' + meta.cpv : '')}</p>
+    <p style="margin-top:36pt;">${date}</p>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<h2>Pirkimo informacija</h2>
+<table class="meta-table">
+  <tr><td>Pirkimo pavadinimas</td><td>${escapeHtml(meta.title || '')}</td></tr>
+  <tr><td>Objekto tipas</td><td>${escapeHtml({goods:'Prekės',services:'Paslaugos',works:'Darbai',mixed:'Mišrios'}[meta.type] || '')}</td></tr>
+  <tr><td>CPV kodas</td><td>${escapeHtml(meta.cpv || '—')}</td></tr>
+  <tr><td>Kiekis</td><td>${escapeHtml((meta.quantity || '—') + ' ' + (meta.unit || ''))}</td></tr>
+  <tr><td>Sutarties trukmė</td><td>${escapeHtml(meta.duration ? meta.duration + ' mėn.' : '—')}</td></tr>
+  <tr><td>Atlikimo vieta</td><td>${escapeHtml(meta.location || '—')}</td></tr>
+  <tr><td>Vertinimo kriterijus</td><td>${escapeHtml({price:'Mažiausia kaina',cost:'Sąnaudos (gyvavimo ciklas)',best_price_quality:'Ekonomiškai naudingiausias'}[meta.criteria] || '—')}</td></tr>
+</table>
+
+<div class="legend">
+<strong>Bendros nuostatos:</strong> Ši specifikacija parengta vadovaujantis LR Pirkimų, atliekamų vandentvarkos, energetikos, transporto ar pašto paslaugų srities perkančiųjų subjektų įstatymu (PĮ), ES Direktyva 2014/25/ES, Viešųjų pirkimų tarnybos rekomendacijomis ir Litgrid AB vidaus tvarkomis. Visi techniniai reikalavimai yra minimalūs — tiekėjas gali pasiūlyti aukštesnio lygio sprendimą.
+</div>
+
+${sections}
+
+${evalCriteria}
+
+${priceBlock}
+
+<div class="page-break"></div>
+
+<h1 style="text-align: center; margin-bottom: 12pt;">Priedas Nr. 1</h1>
+<h2 style="text-align: center;">Atitikties lentelė</h2>
+<p>Tiekėjas privalo užpildyti šią lentelę pažymėdamas atitikimą kiekvienam techninės specifikacijos reikalavimui ir nurodydamas įrodymo šaltinį (techninių aprašų dokumentas, sertifikatas, bandymo protokolas, gamintojo specifikacija ir pan.).</p>
+
+${compliance}
+
+<div class="footer">
+Dokumentą sugeneravo TS Asistentas (Litgrid AB) · ${date}<br/>
+Šis dokumentas yra juodraštis ir turi būti peržiūrėtas pirkimų komisijos prieš skelbiant pirkimą.
+</div>
+
+</div>
+</body>
+</html>`;
+
+    return html;
+  }
+
+  function buildComplianceTable(items) {
+    if (!items || !items.length) return '<p><em>(Atitikties lentelė bus sugeneruota po TS generavimo)</em></p>';
+    const rows = items.map(it => `
+<tr>
+  <td>${escapeHtml(it.ref || '')}</td>
+  <td>${escapeHtml(it.requirement || '')}</td>
+  <td></td>
+  <td></td>
+  <td></td>
+</tr>`).join('\n');
+    return `
+<table>
+<thead>
+<tr>
+<th style="width: 8%;">TS p.</th>
+<th style="width: 42%;">Reikalavimas</th>
+<th style="width: 25%;">Tiekėjo siūlomas sprendimas</th>
+<th style="width: 17%;">Atitikimo įrodymas (dokumentas, puslapis)</th>
+<th style="width: 8%;">Atitinka (Taip/Ne)</th>
+</tr>
+</thead>
+<tbody>
+${rows}
+</tbody>
+</table>`;
+  }
+
+  function buildEvaluationTable(criteria) {
+    if (!criteria || !criteria.length) return '';
+    const rows = criteria.map(c => `
+<tr>
+  <td>${escapeHtml(c.name || '')}</td>
+  <td>${escapeHtml(String(c.weight || ''))}</td>
+  <td style="font-family: monospace;">${escapeHtml(c.formula || '')}</td>
+  <td>${escapeHtml(c.description || '')}</td>
+</tr>`).join('');
+    return `
+<h2>Pasiūlymų vertinimo kriterijai</h2>
+<table>
+<thead>
+<tr>
+<th>Kriterijus</th>
+<th>Svoris (balai)</th>
+<th>Formulė</th>
+<th>Aprašymas</th>
+</tr>
+</thead>
+<tbody>
+${rows}
+</tbody>
+</table>`;
+  }
+
+  function mdToHtml(md) {
+    if (!md) return '';
+    let h = escapeHtml(md);
+    // Bold
+    h = h.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    h = h.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+    // Italic
+    h = h.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    // Headers ### → h4, ## → h3, # → h3
+    h = h.replace(/^####\s+(.+)$/gm, '<h4>$1</h4>');
+    h = h.replace(/^###\s+(.+)$/gm, '<h4>$1</h4>');
+    h = h.replace(/^##\s+(.+)$/gm, '<h3>$1</h3>');
+    h = h.replace(/^#\s+(.+)$/gm, '<h3>$1</h3>');
+    // Lists
+    h = h.replace(/^(\s*)[-*]\s+(.+)$/gm, '<li>$2</li>');
+    h = h.replace(/(<li>[\s\S]*?<\/li>(?:\n<li>[\s\S]*?<\/li>)*)/g, '<ul>$1</ul>');
+    // Numbered lists
+    h = h.replace(/^(\s*)\d+\.\s+(.+)$/gm, '<oli>$2</oli>');
+    h = h.replace(/(<oli>[\s\S]*?<\/oli>(?:\n<oli>[\s\S]*?<\/oli>)*)/g, m => '<ol>' + m.replace(/oli>/g, 'li>') + '</ol>');
+    // Tables (simple pipe tables)
+    h = h.replace(/^\|(.+)\|$\n^\|[-:\s|]+\|$\n((?:^\|.+\|$\n?)+)/gm, (match, header, body) => {
+      const headers = header.split('|').map(s => s.trim()).filter(s => s);
+      const rows = body.trim().split('\n').map(r => r.split('|').map(s => s.trim()).filter(s => s));
+      return `<table><thead><tr>${headers.map(h => '<th>' + h + '</th>').join('')}</tr></thead><tbody>${rows.map(r => '<tr>' + r.map(c => '<td>' + c + '</td>').join('') + '</tr>').join('')}</tbody></table>`;
+    });
+    // Paragraphs
+    h = h.split(/\n\n+/).map(p => {
+      if (p.startsWith('<') || p.trim() === '') return p;
+      return '<p>' + p.replace(/\n/g, '<br/>') + '</p>';
+    }).join('\n');
+    return h;
+  }
+
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function formatPrice(n) {
+    if (n == null) return '—';
+    return Number(n).toLocaleString('lt-LT', { maximumFractionDigits: 0 });
+  }
+
+  function download(html, filename) {
+    const blob = new Blob(['﻿', html], { type: 'application/msword' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename.endsWith('.doc') ? filename : filename + '.doc';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  return {
+    buildTsDocx,
+    mdToHtml,
+    download
+  };
+})();
+
 // Make available globally
 window.CATEGORIES = CATEGORIES;
 window.KNOWLEDGE_BASE = KNOWLEDGE_BASE;
 window.RuleEngine = RuleEngine;
 window.AIAnalyzer = AIAnalyzer;
+window.TSGenerator = TSGenerator;
+window.PriceEstimator = PriceEstimator;
+window.DocxBuilder = DocxBuilder;
 
 </script>
 
