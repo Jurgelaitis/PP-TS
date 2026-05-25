@@ -1552,7 +1552,7 @@ details[open] summary {
               </div>
               <div class="hero-meta-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                CVP IS analogų sintezė
+                Realūs CVP IS duomenys
               </div>
               <div class="hero-meta-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -1741,18 +1741,39 @@ details[open] summary {
         <!-- STEP 3: ANALOGUES -->
         <div class="wizard-step" data-wizard-step="3">
           <div class="step-header">
-            <h2>3. Analogiški pirkimai ir kontekstas</h2>
-            <p>AI sugeneravo CVP IS paieškos nuorodas analogiškiems pirkimams. Atidarykite jas naujuose skirtukuose, peržiūrėkite gerus pavyzdžius ir galite įklijuoti jų techninių specifikacijų fragmentus žemiau — tai labai pagerins galutinio TS kokybę.</p>
+            <h2>3. Analogiški pirkimai ir rinkos duomenys</h2>
+            <p>Įrankis automatiškai parsiunčia analogiškus pirkimus iš CVP IS / get.data.gov.lt (per saugų g-procure backend'ą). Pažymėtus duomenis AI panaudos generuojant TS ir vertinant kainą.</p>
           </div>
 
           <div class="card">
-            <h3 class="card-title">
-              <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              CVP IS paieškos nuorodos
-            </h3>
-            <p class="card-subtitle">Pasirinktos pagal jūsų pavadinimo raktažodžius. Spustelėjus atidaroma CVP IS paieška naujame skirtuke.</p>
-            <div id="genCvpisLinks" class="mt-2"></div>
+            <div class="card-header">
+              <h3 class="card-title">
+                <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                Realūs CVP IS analogai
+                <span id="genFetchStatus" class="badge badge-neutral">Laukiama…</span>
+              </h3>
+              <div class="flex flex-gap-1">
+                <select id="genYearsBack" class="form-select" style="width: auto; font-size: 13px; padding: 6px 12px;" onchange="App.refilterAnalogues()">
+                  <option value="3">Paskutinieji 3 metai</option>
+                  <option value="5">Paskutinieji 5 metai</option>
+                  <option value="0">Visi</option>
+                </select>
+                <button class="btn btn-secondary btn-sm" onclick="App.refetchAnalogues()">
+                  <svg class="ico" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                  Pakartoti
+                </button>
+              </div>
+            </div>
+
+            <div id="genAnalogueStats" class="mt-2"></div>
+            <div id="genAnaloguesList" class="mt-2"></div>
           </div>
+
+          <details class="mt-3">
+            <summary>CVP IS paieškos nuorodos rankiniam tyrimui</summary>
+            <p class="card-subtitle mt-1">Atidarykite naujame skirtuke, jei norite peržiūrėti daugiau analogų.</p>
+            <div id="genCvpisLinks" class="mt-2"></div>
+          </details>
 
           <div class="card mt-3">
             <h3 class="card-title">Įklijuoti analogiškas specifikacijas (neprivaloma)</h3>
@@ -2365,6 +2386,12 @@ details[open] summary {
         <input type="url" id="apiEndpoint" class="form-input" placeholder="https://api.anthropic.com/v1/messages" />
       </div>
 
+      <div class="form-group">
+        <label class="form-label" for="cvpisEndpoint">CVP IS / g-procure backend <span class="help">(realių analogų gavimui)</span></label>
+        <input type="url" id="cvpisEndpoint" class="form-input" placeholder="https://api.g-procure.com" />
+        <div class="form-help">Šis backend'as iš serverio pusės gauna duomenis iš get.data.gov.lt ir grąžina pirkimų sutartis. Be CORS apribojimų.</div>
+      </div>
+
       <div class="grid grid-2">
         <div class="form-group">
           <label class="form-label" for="modelSelect">Modelis</label>
@@ -2458,6 +2485,7 @@ const App = (() => {
       return Object.assign({
         apiKey: '',
         apiEndpoint: 'https://api.anthropic.com/v1/messages',
+        cvpisEndpoint: 'https://api.g-procure.com',
         model: 'claude-sonnet-4-6',
         depth: 'standard',
         options: {
@@ -2476,6 +2504,7 @@ const App = (() => {
   function saveSettings() {
     state.settings.apiKey = $('#apiKey').value.trim();
     state.settings.apiEndpoint = $('#apiEndpoint').value.trim() || 'https://api.anthropic.com/v1/messages';
+    state.settings.cvpisEndpoint = $('#cvpisEndpoint').value.trim() || 'https://api.g-procure.com';
     state.settings.model = $('#modelSelect').value;
     state.settings.depth = $('#depthSelect').value;
     state.settings.options = {
@@ -2545,6 +2574,7 @@ const App = (() => {
     // Apply settings to UI
     $('#apiKey').value = state.settings.apiKey || '';
     $('#apiEndpoint').value = state.settings.apiEndpoint || '';
+    $('#cvpisEndpoint').value = state.settings.cvpisEndpoint || 'https://api.g-procure.com';
     $('#modelSelect').value = state.settings.model || 'claude-sonnet-4-6';
     $('#depthSelect').value = state.settings.depth || 'standard';
     Object.entries(state.settings.options || {}).forEach(([k, v]) => {
@@ -3152,6 +3182,10 @@ const App = (() => {
     ts: null,
     priceData: null,
     cvpisLinks: [],
+    cvpisAnalogues: [],     // visi gauti iš CVP IS API
+    cvpisSelected: new Set(), // pasirinktų indeksai
+    cvpisKeywords: [],
+    cvpisStats: null,
     extraContext: null,
   };
 
@@ -3180,6 +3214,7 @@ const App = (() => {
 
   function goToStep(n) {
     if (n < 1 || n > 5) return;
+    const prev = gen.step;
     gen.step = n;
     $$('.wizard-step').forEach(s => s.classList.toggle('active', parseInt(s.dataset.wizardStep) === n));
     $$('.stepper-step').forEach((s, idx) => {
@@ -3187,6 +3222,10 @@ const App = (() => {
       s.classList.toggle('active', stepNum === n);
       s.classList.toggle('completed', stepNum < n);
     });
+    // Auto-fetch analogues when entering step 3 (only first time)
+    if (n === 3 && prev !== 3 && gen.cvpisAnalogues.length === 0 && gen.meta.title) {
+      fetchAnalogues();
+    }
   }
 
   async function startGeneration() {
@@ -3207,7 +3246,8 @@ const App = (() => {
     try {
       const result = await TSGenerator.generateQuestions(meta, state.settings, () => {});
       gen.questions = result.questions || [];
-      gen.cvpisLinks = TSGenerator.buildCvpisSearchUrls(result.cvpisSearchKeywords || [meta.title]);
+      gen.cvpisKeywords = result.cvpisSearchKeywords || [meta.title];
+      gen.cvpisLinks = TSGenerator.buildCvpisSearchUrls(gen.cvpisKeywords);
       gen.extraContext = { cpvSuggestions: result.cpvSuggestions, marketContext: result.marketContext };
       renderQuestions();
       renderCvpisLinks();
@@ -3284,6 +3324,152 @@ const App = (() => {
     $('#genCvpisLinks').innerHTML = html;
   }
 
+  // === REALŪS CVP IS ANALOGAI ===
+  async function fetchAnalogues() {
+    const keywords = uniqueKeywords([
+      ...(gen.cvpisKeywords || []),
+      gen.meta.title,
+      gen.meta.cpv ? 'CPV ' + gen.meta.cpv : null,
+    ].filter(Boolean));
+
+    const statusEl = $('#genFetchStatus');
+    if (statusEl) {
+      statusEl.className = 'badge badge-warning';
+      statusEl.textContent = 'Siunčiama užklausa...';
+    }
+    $('#genAnaloguesList').innerHTML = '<div class="empty-state"><div class="spinner spinner-lg"></div><h3 class="mt-2">Gaunami CVP IS duomenys...</h3><p>Tikriname analogiškus pirkimus per g-procure API.</p></div>';
+
+    try {
+      const items = await CVPISClient.searchMultiple(keywords.slice(0, 6), 15, state.settings);
+      gen.cvpisAnalogues = items;
+      // Pre-select top 10 most recent
+      gen.cvpisSelected = new Set();
+      items.slice(0, 10).forEach((_, i) => gen.cvpisSelected.add(i));
+      refilterAnalogues();
+      if (statusEl) {
+        statusEl.className = 'badge badge-success';
+        statusEl.textContent = `Rasta ${items.length} sutarčių`;
+      }
+    } catch (err) {
+      console.error(err);
+      if (statusEl) {
+        statusEl.className = 'badge badge-error';
+        statusEl.textContent = 'Klaida';
+      }
+      $('#genAnaloguesList').innerHTML = `<div class="alert alert-error">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div>Nepavyko gauti CVP IS duomenų: ${escapeHtml(err.message)}. Galite tęsti su rankiniu įklijavimu žemiau.</div>
+      </div>`;
+    }
+  }
+
+  function refetchAnalogues() {
+    fetchAnalogues();
+  }
+
+  function refilterAnalogues() {
+    const yearsBack = parseInt($('#genYearsBack')?.value || '3');
+    let items = gen.cvpisAnalogues;
+    if (yearsBack > 0) items = CVPISClient.filterByYearRange(items, yearsBack);
+    const stats = CVPISClient.priceStats(items);
+    gen.cvpisStats = stats;
+    renderAnalogueStats(stats, items.length);
+    renderAnaloguesList(items);
+  }
+
+  function uniqueKeywords(arr) {
+    const seen = new Set();
+    return arr.filter(k => {
+      const lk = (k || '').toLowerCase().trim();
+      if (!lk || seen.has(lk)) return false;
+      seen.add(lk);
+      return true;
+    });
+  }
+
+  function renderAnalogueStats(stats, totalCount) {
+    if (!stats || stats.count === 0) {
+      $('#genAnalogueStats').innerHTML = '<p class="card-subtitle"><em>Nepakanka kainų duomenų statistikai.</em></p>';
+      return;
+    }
+    const fmt = n => Math.round(n).toLocaleString('lt-LT') + ' €';
+    $('#genAnalogueStats').innerHTML = `
+      <div class="metric-grid">
+        <div class="metric"><div class="metric-label">Sutarčių rasta</div><div class="metric-value">${totalCount}</div><div class="metric-help">${stats.count} su kainomis</div></div>
+        <div class="metric metric-success"><div class="metric-label">Mediana</div><div class="metric-value" style="font-size:22px;">${fmt(stats.median)}</div><div class="metric-help">tipinė vertė</div></div>
+        <div class="metric"><div class="metric-label">Vidurkis (apkarp.)</div><div class="metric-value" style="font-size:22px;">${fmt(stats.trimmedMean)}</div><div class="metric-help">be ekstremumų</div></div>
+        <div class="metric"><div class="metric-label">Rėžis (P25–P75)</div><div class="metric-value" style="font-size:18px;">${fmt(stats.p25)} – ${fmt(stats.p75)}</div><div class="metric-help">50% pirkimų</div></div>
+        <div class="metric metric-warning"><div class="metric-label">Min / Max</div><div class="metric-value" style="font-size:18px;">${fmt(stats.min)} – ${fmt(stats.max)}</div><div class="metric-help">visa amplitudė</div></div>
+      </div>
+    `;
+  }
+
+  function renderAnaloguesList(items) {
+    if (!items.length) {
+      $('#genAnaloguesList').innerHTML = `<div class="alert alert-warning">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div>Atsijuos pagal pasirinktą laikotarpį — nerasta. Pakeiskite laikotarpį arba tęskite su AI generuojama TS be CVP IS konteksto.</div>
+      </div>`;
+      return;
+    }
+
+    const headerHtml = `
+      <div class="flex flex-between mb-1">
+        <div class="card-subtitle"><strong>${items.length}</strong> analogų pasirinkti AI generavimui</div>
+        <div class="flex flex-gap-1">
+          <button class="btn btn-ghost btn-sm" onclick="App.selectAllAnalogues()">Pasirinkti visus</button>
+          <button class="btn btn-ghost btn-sm" onclick="App.deselectAllAnalogues()">Atšaukti</button>
+        </div>
+      </div>
+    `;
+
+    const itemsHtml = items.map((it, idx) => {
+      const checked = gen.cvpisSelected.has(idx) ? 'checked' : '';
+      const valStr = it.value != null ? Math.round(it.value).toLocaleString('lt-LT') + ' €' : '—';
+      const dateStr = it.date ? it.date.toLocaleDateString('lt-LT') : '—';
+      return `
+        <div class="ref-sample" style="display: grid; grid-template-columns: auto 1fr auto auto; gap: 12px; align-items: center;">
+          <label class="switch" style="margin: 0;">
+            <input type="checkbox" ${checked} onchange="App.toggleAnalogue(${idx}, this.checked)">
+            <span class="switch-track"></span>
+          </label>
+          <div>
+            <div style="font-weight: 600; font-size: 13px;">${escapeHtml(it.name)}</div>
+            <div style="font-size: 11px; color: var(--color-graphite-50);">
+              ${dateStr}${it.year ? ' · ' + it.year + ' m.' : ''}${it.sourceQuery ? ' · raktažodis: "' + escapeHtml(it.sourceQuery) + '"' : ''}
+            </div>
+          </div>
+          <div style="text-align: right; font-weight: 700; font-size: 14px; color: var(--color-emerald-120);">${valStr}</div>
+        </div>`;
+    }).join('');
+
+    $('#genAnaloguesList').innerHTML = headerHtml + itemsHtml;
+  }
+
+  function toggleAnalogue(idx, checked) {
+    if (checked) gen.cvpisSelected.add(idx);
+    else gen.cvpisSelected.delete(idx);
+  }
+
+  function selectAllAnalogues() {
+    const yearsBack = parseInt($('#genYearsBack')?.value || '3');
+    const items = yearsBack > 0 ? CVPISClient.filterByYearRange(gen.cvpisAnalogues, yearsBack) : gen.cvpisAnalogues;
+    gen.cvpisSelected = new Set(items.map((_, i) => i));
+    refilterAnalogues();
+  }
+
+  function deselectAllAnalogues() {
+    gen.cvpisSelected = new Set();
+    refilterAnalogues();
+  }
+
+  function getSelectedAnalogues() {
+    const yearsBack = parseInt($('#genYearsBack')?.value || '3');
+    let items = gen.cvpisAnalogues;
+    if (yearsBack > 0) items = CVPISClient.filterByYearRange(items, yearsBack);
+    return items.filter((_, idx) => gen.cvpisSelected.has(idx));
+  }
+
   function addReference() {
     gen.references.push({ label: '', text: '' });
     renderReferences();
@@ -3331,11 +3517,14 @@ const App = (() => {
 
     setGenProgress('Generuojama TS turinio struktūra...', 10);
     try {
+      const selectedAnalogues = getSelectedAnalogues();
+      const cvpisStats = gen.cvpisStats;
+
       // Generate TS and Price in parallel for speed
       const [ts, priceData] = await Promise.all([
-        TSGenerator.generateFullTs(gen.meta, gen.answers, gen.references, state.settings, setGenProgress)
+        TSGenerator.generateFullTs(gen.meta, gen.answers, gen.references, state.settings, setGenProgress, selectedAnalogues)
           .catch(err => { console.error('TS gen err:', err); throw err; }),
-        PriceEstimator.estimate(gen.meta, gen.answers, state.settings, () => {})
+        PriceEstimator.estimate(gen.meta, gen.answers, state.settings, () => {}, selectedAnalogues, cvpisStats)
           .catch(err => { console.warn('Price err:', err); return null; })
       ]);
       gen.ts = ts;
@@ -3566,6 +3755,9 @@ const App = (() => {
     sendToAnalysis, sendToFullAnalysis,
     exportGeneratedDocx, exportGeneratedMd, exportGeneratedTxt, exportGeneratedHtml,
     startNewGeneration,
+    // CVP IS realūs duomenys
+    fetchAnalogues, refetchAnalogues, refilterAnalogues,
+    toggleAnalogue, selectAllAnalogues, deselectAllAnalogues,
   };
 })();
 
@@ -4406,9 +4598,16 @@ GRĄŽINK TIK VALID JSON (be markdown):
     return parseJson(content);
   }
 
-  async function generateFullTs(meta, answers, references, settings, onProgress) {
+  async function generateFullTs(meta, answers, references, settings, onProgress, cvpisAnalogues) {
     const answersBlock = (answers || []).map((a, i) => `Q${i+1}: ${a.question}\nA${i+1}: ${a.answer || '(praleista)'}`).join('\n\n');
     const refsBlock = (references || []).filter(r => r.text && r.text.trim()).map((r, i) => `--- Analogas ${i+1} (${r.label || 'be pavadinimo'}) ---\n${r.text.slice(0, 4000)}\n--- pabaiga ---`).join('\n\n');
+
+    // Realių CVP IS analogų formatavimas AI prompt'ui
+    const cvpisBlock = (cvpisAnalogues && cvpisAnalogues.length) ? `\nREALŪS CVP IS ANALOGAI (gauti tiesiogiai iš get.data.gov.lt per g-procure backend):\n${cvpisAnalogues.slice(0, 30).map((a, i) => {
+      const dt = a.date ? a.date.toISOString().slice(0, 10) : 'data nežinoma';
+      const val = a.value != null ? Math.round(a.value).toLocaleString('lt-LT') + ' EUR' : 'vertė nepaviešinta';
+      return `${i+1}. „${a.name}" — ${val}, sutartis sudaryta ${dt}${a.sourceQuery ? ' (rastas pagal: ' + a.sourceQuery + ')' : ''}`;
+    }).join('\n')}\n` : '';
 
     const userMsg = `Pirkimo pirminė informacija:
 - Pavadinimas: ${meta.title}
@@ -4426,7 +4625,8 @@ GRĄŽINK TIK VALID JSON (be markdown):
 VARTOTOJO ATSAKYMAI Į PATIKSLINIMO KLAUSIMUS:
 ${answersBlock || '(praleisti)'}
 
-${refsBlock ? 'ANALOGIŠKŲ PIRKIMŲ TS FRAGMENTAI (naudoti tik kaip kontekstą — NIEKADA nekopijuoti tiesiogiai):\n' + refsBlock : ''}
+${cvpisBlock}
+${refsBlock ? 'ĮKLIJUOTI ANALOGIŠKŲ PIRKIMŲ TS FRAGMENTAI (naudoti tik kaip kontekstą — NIEKADA nekopijuoti tiesiogiai):\n' + refsBlock : ''}
 
 UŽDUOTIS:
 Sugeneruok PILNĄ profesionalią techninę specifikaciją. Reikalavimai:
@@ -4601,8 +4801,33 @@ MISIJA:
 
 NIEKADA NEMELUOK — jei trūksta informacijos, sakyk „nepakanka duomenų patikimam įvertinimui" ir pateik tik orientacinį rėžį su didele tolerancija.`;
 
-  async function estimate(meta, answers, settings, onProgress) {
+  async function estimate(meta, answers, settings, onProgress, cvpisAnalogues, cvpisStats) {
     const answersBlock = (answers || []).map((a, i) => `${a.question}: ${a.answer || '(praleista)'}`).join('\n');
+
+    // Realių CVP IS sutarčių duomenys
+    const fmt = n => n != null ? Math.round(n).toLocaleString('lt-LT') + ' EUR' : '—';
+    let cvpisBlock = '';
+    if (cvpisAnalogues && cvpisAnalogues.length) {
+      const lines = cvpisAnalogues.slice(0, 40).map((a, i) => {
+        const dt = a.date ? a.date.toISOString().slice(0, 10) : '—';
+        return `${i+1}. „${a.name}" · ${fmt(a.value)} · ${dt}`;
+      }).join('\n');
+      cvpisBlock = `\n\nREALŪS CVP IS DUOMENYS (sutarčių sudarymo vertės, paviešintos viešųjų pirkimų sistemoje):\n${lines}`;
+    }
+    let statsBlock = '';
+    if (cvpisStats && cvpisStats.count > 0) {
+      statsBlock = `\n\nSTATISTIKA IŠ REALIŲ ANALOGIŠKŲ PIRKIMŲ:
+- Pirkimų su žinoma verte: ${cvpisStats.count}
+- Mediana: ${fmt(cvpisStats.median)}
+- Apkarpytas vidurkis (be 10% ekstremumų): ${fmt(cvpisStats.trimmedMean)}
+- Vidurkis: ${fmt(cvpisStats.mean)}
+- 25-asis procentilis (P25): ${fmt(cvpisStats.p25)}
+- 75-asis procentilis (P75): ${fmt(cvpisStats.p75)}
+- Standartinis nuokrypis: ${fmt(cvpisStats.stdDev)}
+- Min / Max: ${fmt(cvpisStats.min)} / ${fmt(cvpisStats.max)}
+
+SVARBU: Šie duomenys yra realūs ir patikimi (iš VPT/get.data.gov.lt). Naudok juos kaip pagrindinį atskaitos tašką, koreguodamas pagal mūsų pirkimo specifiką (kiekį, trukmę, specialius reikalavimus).`;
+    }
 
     const userMsg = `Įvertink šio pirkimo numatomą vertę:
 
@@ -4618,7 +4843,7 @@ PIRKIMO INFORMACIJA:
 - Specialūs reikalavimai: ${meta.special || '(nenurodyta)'}
 
 PAPILDOMI ATSAKYMAI:
-${answersBlock || '(praleista)'}
+${answersBlock || '(praleista)'}${cvpisBlock}${statsBlock}
 
 UŽDUOTIS:
 Pateik išsamų kainos vertinimą. GRĄŽINK TIK VALID JSON (be markdown):
@@ -4706,6 +4931,103 @@ SVARBU: Visos kainos turi būti realistiškos. Energetikos sektoriaus pirkimams 
   }
 
   return { estimate };
+})();
+
+// ---------- CVP IS KLIENTAS (per g-procure backend) ----------
+const CVPISClient = (() => {
+
+  const DEFAULT_BASE = 'https://api.g-procure.com';
+
+  function endpoint(settings) {
+    return (settings?.cvpisEndpoint || DEFAULT_BASE).replace(/\/$/, '');
+  }
+
+  async function search(query, limit = 20, settings = {}) {
+    const url = `${endpoint(settings)}/api/vpt?search=${encodeURIComponent(query)}&limit=${limit}`;
+    const res = await fetch(url, { method: 'GET' });
+    if (!res.ok) throw new Error(`CVP IS API klaida ${res.status}`);
+    const data = await res.json();
+    return {
+      query,
+      count: data.count || 0,
+      items: (data.data || []).map(normalizeItem)
+    };
+  }
+
+  function normalizeItem(it) {
+    return {
+      name: it.dok_sut_obj_pav || '',
+      value: parseValue(it.dok_sut_verte),
+      valueRaw: it.dok_sut_verte || '',
+      date: it.dok_sudarymo_data ? new Date(it.dok_sudarymo_data) : null,
+      procurementNumber: it.dok_pirkimo_numeris || null,
+      year: it.dok_sudarymo_data ? new Date(it.dok_sudarymo_data).getFullYear() : null,
+    };
+  }
+
+  function parseValue(s) {
+    if (s == null) return null;
+    if (typeof s === 'number') return s;
+    // Lithuanian decimal: "12 345,67" -> 12345.67
+    const cleaned = String(s).replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
+    const n = parseFloat(cleaned);
+    return isNaN(n) ? null : n;
+  }
+
+  // Multi-keyword aggregated search
+  async function searchMultiple(keywords, perKeyword = 10, settings = {}) {
+    const all = [];
+    const seen = new Set();
+    for (const kw of keywords) {
+      try {
+        const res = await search(kw, perKeyword, settings);
+        res.items.forEach(it => {
+          const k = it.name + '||' + it.valueRaw + '||' + (it.date?.toISOString() || '');
+          if (!seen.has(k)) {
+            seen.add(k);
+            all.push({ ...it, sourceQuery: kw });
+          }
+        });
+      } catch (err) {
+        console.warn('CVPIS search failed for "' + kw + '":', err.message);
+      }
+    }
+    // Sort by date desc
+    all.sort((a, b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0));
+    return all;
+  }
+
+  // Compute price statistics from a list of items
+  function priceStats(items) {
+    const values = items.map(it => it.value).filter(v => v != null && v > 0);
+    if (!values.length) return null;
+    values.sort((a, b) => a - b);
+    const n = values.length;
+    const sum = values.reduce((s, v) => s + v, 0);
+    const mean = sum / n;
+    const median = n % 2 === 0 ? (values[n/2-1] + values[n/2]) / 2 : values[Math.floor(n/2)];
+    const min = values[0];
+    const max = values[n - 1];
+    // Trimmed mean (drop 10% from each end)
+    const trim = Math.max(1, Math.floor(n * 0.1));
+    const trimmed = values.slice(trim, n - trim);
+    const trimmedMean = trimmed.length ? trimmed.reduce((s, v) => s + v, 0) / trimmed.length : mean;
+    // Standard deviation
+    const variance = values.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / n;
+    const stdDev = Math.sqrt(variance);
+    // Percentiles
+    const p25 = values[Math.floor(n * 0.25)];
+    const p75 = values[Math.floor(n * 0.75)];
+    return { count: n, min, max, mean, median, trimmedMean, stdDev, p25, p75, sum };
+  }
+
+  function filterByYearRange(items, yearsBack = 3) {
+    const cutoff = new Date();
+    cutoff.setFullYear(cutoff.getFullYear() - yearsBack);
+    return items.filter(it => it.date && it.date >= cutoff);
+  }
+
+  return { search, searchMultiple, priceStats, filterByYearRange, normalizeItem };
 })();
 
 // ---------- DOCX BUILDER (paprastas HTML→DOC su MS Word suderinamumu) ----------
@@ -4956,6 +5278,7 @@ window.AIAnalyzer = AIAnalyzer;
 window.TSGenerator = TSGenerator;
 window.PriceEstimator = PriceEstimator;
 window.DocxBuilder = DocxBuilder;
+window.CVPISClient = CVPISClient;
 
 </script>
 
