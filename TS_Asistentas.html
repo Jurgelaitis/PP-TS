@@ -4443,14 +4443,16 @@ Atlik specifikacijos analizę pagal sistemos prompt'e nurodytas kryptis ir grą�
       messages: [{ role: 'user', content: userMessage }]
     };
 
+    const isProxy = endpoint.includes('g-procure.com') || endpoint.includes('localhost');
+    const headers = { 'Content-Type': 'application/json' };
+    if (!isProxy) {
+      headers['x-api-key'] = settings.apiKey;
+      headers['anthropic-version'] = '2023-06-01';
+      headers['anthropic-dangerous-direct-browser-access'] = 'true';
+    }
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': settings.apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
+      headers,
       body: JSON.stringify(body)
     });
 
@@ -4697,14 +4699,16 @@ GRĄŽINK TIK VALID JSON (be markdown), maždaug 4000-6000 žodžių TS:
       messages: [{ role: 'user', content: userMessage }]
     };
 
+    const isProxy = endpoint.includes('g-procure.com') || endpoint.includes('localhost');
+    const headers = { 'Content-Type': 'application/json' };
+    if (!isProxy) {
+      headers['x-api-key'] = settings.apiKey;
+      headers['anthropic-version'] = '2023-06-01';
+      headers['anthropic-dangerous-direct-browser-access'] = 'true';
+    }
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': settings.apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
+      headers,
       body: JSON.stringify(body)
     });
 
@@ -4902,14 +4906,16 @@ SVARBU: Visos kainos turi būti realistiškos. Energetikos sektoriaus pirkimams 
       messages: [{ role: 'user', content: userMessage }]
     };
 
+    const isProxy = endpoint.includes('g-procure.com') || endpoint.includes('localhost');
+    const headers = { 'Content-Type': 'application/json' };
+    if (!isProxy) {
+      headers['x-api-key'] = settings.apiKey;
+      headers['anthropic-version'] = '2023-06-01';
+      headers['anthropic-dangerous-direct-browser-access'] = 'true';
+    }
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': settings.apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
+      headers,
       body: JSON.stringify(body)
     });
 
