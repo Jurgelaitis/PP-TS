@@ -4362,6 +4362,48 @@ function smartParseJson(content) {
 window.repairTruncatedJson = repairTruncatedJson;
 window.smartParseJson = smartParseJson;
 
+// ---------- BENDRAS FETCH SU RETRY (429 rate limit handling) ----------
+async function fetchWithRetry(endpoint, options, maxRetries = 4) {
+  let lastError = null;
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const response = await fetch(endpoint, options);
+      // Sėkmė - grąžinti
+      if (response.ok) return response;
+      // 429 (rate limit) ar 503 (service unavailable) - laukti ir bandyti dar kartą
+      if ((response.status === 429 || response.status === 503) && attempt < maxRetries - 1) {
+        // Patikrinti Retry-After header
+        const retryAfter = response.headers.get('retry-after');
+        let waitMs;
+        if (retryAfter) {
+          waitMs = parseInt(retryAfter) * 1000;
+        } else {
+          waitMs = Math.min(60000, Math.pow(2, attempt) * 2000 + Math.random() * 1000);
+        }
+        console.warn(`API rate limit (${response.status}), pakartojama po ${Math.round(waitMs/1000)}s... (${attempt+1}/${maxRetries})`);
+        await new Promise(r => setTimeout(r, waitMs));
+        continue;
+      }
+      // Kitos klaidos - grąžinti response, tegul callee tvarko
+      return response;
+    } catch (err) {
+      lastError = err;
+      // Network klaida - retry tik jei dar liko bandymų
+      if (attempt < maxRetries - 1) {
+        const waitMs = Math.pow(2, attempt) * 1500;
+        console.warn(`Network klaida, pakartojama po ${Math.round(waitMs/1000)}s...`, err.message);
+        await new Promise(r => setTimeout(r, waitMs));
+        continue;
+      }
+      throw err;
+    }
+  }
+  if (lastError) throw lastError;
+  throw new Error('Visos retry bandymos nepavyko');
+}
+
+window.fetchWithRetry = fetchWithRetry;
+
 // ---------- AI ANALIZĖ (Claude API) ----------
 const AIAnalyzer = (() => {
 
@@ -4501,7 +4543,7 @@ Atlik specifikacijos analizę pagal sistemos prompt'e nurodytas kryptis ir grą�
       messages: [{ role: 'user', content: userMessage }]
     };
 
-    const response = await fetch(endpoint, {
+    const response = await fetchWithRetry(endpoint, {
       method: 'POST',
       headers: (() => {
         const h = { 'Content-Type': 'application/json' };
@@ -4800,7 +4842,7 @@ Kategorijos: technical, quality, delivery, warranty, qualification, security, ot
       messages: [{ role: 'user', content: userMessage }]
     };
 
-    const response = await fetch(endpoint, {
+    const response = await fetchWithRetry(endpoint, {
       method: 'POST',
       headers: (() => {
         const h = { 'Content-Type': 'application/json' };
@@ -4865,11 +4907,139 @@ Kategorijos: technical, quality, delivery, warranty, qualification, security, ot
     return md;
   }
 
+  // ---------- AUTO-PRITAIKYTI REKOMENDACIJAS ----------
+  // Naudoja analizės rezultatus (issues) ir pritaiko juos sugeneruotai TS
+  async function applyRecommendations(generatedTs, issues, meta, settings, onProgress) {
+    if (!generatedTs || !generatedTs.sections || !generatedTs.sections.length) {
+      throw new Error('Nėra sugeneruotos TS, į kurią pritaikyti rekomendacijas.');
+    }
+
+    // Filtruoti tik kritines ir reikšmingas - tos, kurios tikrai vertos taikyti
+    const criticalAndMajor = (issues || []).filter(i => i.severity === 'critical' || i.severity === 'major');
+    if (!criticalAndMajor.length) {
+      throw new Error('Nėra kritinių ar reikšmingų pastabų, kurias reikėtų taikyti.');
+    }
+
+    onProgress?.('Analizuojami reikalavimai...', 5);
+
+    // Sugrupuoti pastabas pagal skyrių (pagal tai, kur tekste cituojama)
+    const sectionsToUpdate = [];
+    const sectionsKept = [];
+
+    for (const section of generatedTs.sections) {
+      const sectionContent = section.content || '';
+      const sectionContentLower = sectionContent.toLowerCase();
+
+      // Surasti pastabas, kurių citata aptinkama šio skyriaus tekste
+      const matchedIssues = criticalAndMajor.filter(issue => {
+        if (!issue.quote) return false;
+        const quoteLower = issue.quote.toLowerCase().trim();
+        // Patikrinti, ar dalis citatos randama skyriaus tekste
+        const sample = quoteLower.slice(0, Math.min(50, quoteLower.length));
+        return sectionContentLower.includes(sample);
+      });
+
+      if (matchedIssues.length) {
+        sectionsToUpdate.push({ section, issues: matchedIssues });
+      } else {
+        sectionsKept.push(section);
+      }
+    }
+
+    // Jei jokie skyriai neturi atitikimo - bandome pritaikyti kategorijomis
+    if (!sectionsToUpdate.length) {
+      // Pateikti visas issues paskutiniam skyriui kaip "global"
+      const fallback = generatedTs.sections[generatedTs.sections.length - 1];
+      sectionsToUpdate.push({ section: fallback, issues: criticalAndMajor });
+      sectionsKept.pop();
+    }
+
+    onProgress?.(`Pritaikomos pastabos ${sectionsToUpdate.length} skyriuose...`, 15);
+
+    // Lygiagrečiai pataisyti kiekvieną skyrių
+    const updatePromises = sectionsToUpdate.map((item, idx) =>
+      fixSection(item.section, item.issues, meta, settings)
+        .then(updatedContent => ({
+          ...item.section,
+          content: updatedContent,
+          _wasUpdated: true,
+          _appliedIssues: item.issues.length
+        }))
+        .catch(err => {
+          console.error(`Skyriaus ${item.section.number} pataisymas nepavyko:`, err);
+          return { ...item.section, _updateError: err.message };
+        })
+    );
+
+    onProgress?.('Vyksta pataisymai (lygiagreciai)...', 30);
+    const updatedSections = await Promise.all(updatePromises);
+
+    onProgress?.('Sukomponuojama TS...', 85);
+
+    // Sukomponuoti pataisytus + nepakeistus skyrius pagal original tvarką
+    const allSections = generatedTs.sections.map(orig => {
+      const updated = updatedSections.find(u => u.number === orig.number);
+      return updated || orig;
+    });
+
+    onProgress?.('Atlikta', 95);
+
+    return {
+      ...generatedTs,
+      sections: allSections,
+      _appliedRecommendations: {
+        totalIssuesApplied: criticalAndMajor.length,
+        sectionsUpdated: sectionsToUpdate.length,
+        timestamp: new Date().toISOString()
+      }
+    };
+  }
+
+  async function fixSection(section, issues, meta, settings) {
+    const issuesText = issues.map((i, idx) => {
+      const parts = [`${idx + 1}. [${i.severity.toUpperCase()}] ${i.title}`];
+      if (i.description) parts.push(`   Problema: ${i.description}`);
+      if (i.quote) parts.push(`   Citata: "${i.quote}"`);
+      if (i.recommendation) parts.push(`   Rekomendacija: ${i.recommendation}`);
+      if (i.alternative) parts.push(`   Alternatyvus formulavimas: ${i.alternative}`);
+      if (i.legalRef) parts.push(`   Teisinis pagrindas: ${i.legalRef}`);
+      return parts.join('\n');
+    }).join('\n\n');
+
+    const userMsg = `Pataisyk šio TS skyriaus turinį, kad jis atitiktų pateiktas rekomendacijas.
+
+Pirkimas: ${meta.title || '(nenurodytas)'}
+Skyrius: ${section.number}. ${section.title}
+
+ORIGINALUS SKYRIAUS TURINYS:
+${section.content || ''}
+
+PASTABOS IR REKOMENDACIJOS, KURIAS REIKIA PRITAIKYTI:
+${issuesText}
+
+UŽDUOTIS:
+Sugrąžink PATAISYTĄ skyriaus turinį markdown formatu. Konkrečiai:
+1. Pašalink arba pakeisk problemingas vietas pagal rekomendacijas
+2. Jei reikia, pridėk "arba lygiavertis" po prekės ženklų
+3. Pakeisk subjektyvius terminus (kokybiškas, patikimas) į matuojamus (ISO standartas, MTBF > X)
+4. Išlaikyk skyriaus struktūrą ir numeracija (${section.number}.X)
+5. Išlaikyk profesionalų toną
+6. Pridėk konkrečius matuojamus parametrus kur trūksta
+7. NEIŠTRINK gerų esamo turinio dalių
+8. Atitik PĮ 28, 30, 33, 35, 47, 55 straipsnių reikalavimus
+
+GRĄŽINK TIK MARKDOWN turinį (NE JSON, NE markdown kodų blokus su \`\`\`). Pradėk tiesiogiai nuo turinio.`;
+
+    const content = await callClaude(userMsg, settings, 4000);
+    return content.replace(/^```(?:markdown)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+  }
+
   return {
     generateQuestions,
     generateFullTs,
     buildCvpisSearchUrls,
-    tsToMarkdown
+    tsToMarkdown,
+    applyRecommendations
   };
 })();
 
@@ -4999,7 +5169,7 @@ SVARBU: Visos kainos turi būti realistiškos. Energetikos sektoriaus pirkimams 
       messages: [{ role: 'user', content: userMessage }]
     };
 
-    const response = await fetch(endpoint, {
+    const response = await fetchWithRetry(endpoint, {
       method: 'POST',
       headers: (() => {
         const h = { 'Content-Type': 'application/json' };
