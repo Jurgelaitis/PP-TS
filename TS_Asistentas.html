@@ -4641,92 +4641,154 @@ KIEKVIENAS klausimas - trumpas, hint - max 1 sakinys. Bendras atsakymas < 4000 �
 
   async function generateFullTs(meta, answers, references, settings, onProgress, cvpisAnalogues) {
     const answersBlock = (answers || []).map((a, i) => `Q${i+1}: ${a.question}\nA${i+1}: ${a.answer || '(praleista)'}`).join('\n\n');
-    const refsBlock = (references || []).filter(r => r.text && r.text.trim()).map((r, i) => `--- Analogas ${i+1} (${r.label || 'be pavadinimo'}) ---\n${r.text.slice(0, 4000)}\n--- pabaiga ---`).join('\n\n');
+    const refsBlock = (references || []).filter(r => r.text && r.text.trim()).map((r, i) => `--- Analogas ${i+1} ---\n${r.text.slice(0, 2000)}\n--- pabaiga ---`).join('\n\n');
+    const cvpisBlock = (cvpisAnalogues && cvpisAnalogues.length) ? `\nCVP IS ANALOGAI:\n${cvpisAnalogues.slice(0, 15).map((a, i) => {
+      const dt = a.date ? a.date.toISOString().slice(0, 10) : '-';
+      const val = a.value != null ? Math.round(a.value).toLocaleString('lt-LT') + ' EUR' : '-';
+      return `${i+1}. "${a.name}" - ${val} (${dt})`;
+    }).join('\n')}` : '';
 
-    // Realių CVP IS analogų formatavimas AI prompt'ui
-    const cvpisBlock = (cvpisAnalogues && cvpisAnalogues.length) ? `\nREALŪS CVP IS ANALOGAI (gauti tiesiogiai iš get.data.gov.lt per g-procure backend):\n${cvpisAnalogues.slice(0, 30).map((a, i) => {
-      const dt = a.date ? a.date.toISOString().slice(0, 10) : 'data nežinoma';
-      const val = a.value != null ? Math.round(a.value).toLocaleString('lt-LT') + ' EUR' : 'vertė nepaviešinta';
-      return `${i+1}. „${a.name}" - ${val}, sutartis sudaryta ${dt}${a.sourceQuery ? ' (rastas pagal: ' + a.sourceQuery + ')' : ''}`;
-    }).join('\n')}\n` : '';
+    const ctx = { meta, answersBlock, refsBlock, cvpisBlock };
 
-    const userMsg = `Pirkimo pirminė informacija:
-- Pavadinimas: ${meta.title}
-- Objekto tipas: ${meta.type}
-- CPV: ${meta.cpv || '(nenurodyta)'}
-- Paskirtis: ${meta.purpose || '(nenurodyta)'}
-- Kiekis: ${meta.quantity || '(nenurodyta)'} ${meta.unit || ''}
-- Trukmė: ${meta.duration || '(nenurodyta)'} mėn.
-- Pristatymo terminas: ${meta.deadline || '(nenurodyta)'}
-- Vieta: ${meta.location || '(nenurodyta)'}
-- Numatoma vertė: ${meta.budget ? meta.budget + ' EUR' : '(nenurodyta)'}
-- Vertinimo kriterijus: ${meta.criteria || '(AI parinks)'}
-- Specialūs reikalavimai: ${meta.special || '(nenurodyta)'}
+    // ŽINGSNIS 1: Sugeneruoti TS karkasą (antraštės + metaduomenys), 30-60 sek
+    onProgress?.('1/3: Generuojama TS struktūra...', 10);
+    const skeleton = await generateSkeleton(ctx, settings);
 
-VARTOTOJO ATSAKYMAI Į PATIKSLINIMO KLAUSIMUS:
+    // ŽINGSNIS 2: Generuoti kiekvieną skyrių LYGIAGREČIAI, 30-60 sek visiems iš karto
+    const sectionTitles = skeleton.sectionTitles || [];
+    onProgress?.(`2/3: Generuojami ${sectionTitles.length} skyriai (lygiagreciai)...`, 30);
+
+    const sectionPromises = sectionTitles.map((section, idx) =>
+      generateSectionContent(section, idx, ctx, settings)
+        .then(content => ({ number: section.number, title: section.title, content }))
+        .catch(err => {
+          console.error(`Skyrius ${section.number} nepavyko:`, err);
+          return { number: section.number, title: section.title, content: `*(Šis skyrius nesugeneruotas: ${err.message}. Galite redaguoti rankiniu būdu.)*` };
+        })
+    );
+    const sections = await Promise.all(sectionPromises);
+
+    // ŽINGSNIS 3: Atitikties lentelė, 30-60 sek
+    onProgress?.('3/3: Generuojama atitikties lentelė...', 80);
+    const complianceTable = await generateCompliance(sections, ctx, settings).catch(err => {
+      console.warn('Atitikties lentelė nepavyko:', err);
+      return [];
+    });
+
+    onProgress?.('Atlikta', 95);
+    return {
+      title: skeleton.title || ctx.meta.title,
+      sections,
+      complianceTable,
+      evaluationCriteria: skeleton.evaluationCriteria || [],
+      keyElements: skeleton.keyElements || {},
+      recommendations: skeleton.recommendations || []
+    };
+  }
+
+  async function generateSkeleton(ctx, settings) {
+    const { meta, answersBlock, cvpisBlock } = ctx;
+    const userMsg = `Pirkimas: ${meta.title}
+Tipas: ${meta.type}
+Kiekis: ${meta.quantity || '-'} ${meta.unit || ''}
+Trukmė: ${meta.duration || '-'} mėn.
+Vieta: ${meta.location || '-'}
+Specialūs reikalavimai: ${meta.special || '-'}
+
+Vartotojo atsakymai į patikslinimo klausimus:
 ${answersBlock || '(praleisti)'}
-
 ${cvpisBlock}
-${refsBlock ? 'ĮKLIJUOTI ANALOGIŠKŲ PIRKIMŲ TS FRAGMENTAI (naudoti tik kaip kontekstą - NIEKADA nekopijuoti tiesiogiai):\n' + refsBlock : ''}
 
-UŽDUOTIS:
-Sugeneruok PILNĄ profesionalią techninę specifikaciją. Reikalavimai:
-1. Naudok aiškią numeruotą struktūrą (1., 1.1., 1.1.1.)
-2. Kiekvienas reikalavimas turi turėti unikalų numerį (būsim naudojami atitikties lentelėje)
-3. Naudok matuojamus parametrus (ne „aukštos kokybės", o „atitinkantis ISO 9001")
-4. Įtrauk nuorodas į standartus (ISO/IEC/EN/LST EN)
-5. Numatyk garantijos sąlygas, delspinigius, sutarties vykdymo užtikrinimą
-6. Atitik PĮ 33, 35, 47, 55 straipsnius
-7. Pridėk pasiūlymų vertinimo metodiką su tiksliais balais
-8. Jeigu reikia nurodyti prekės ženklą - visada pridedi „arba lygiavertis"
+UŽDUOTIS: Sugeneruok TS karkasą (TIK antraščių pavadinimai + metaduomenys). Skyrių TURINIO NEGENERUOK - jis bus generuojamas atskirai.
 
-ATITIKTIES LENTELĖ:
-Iš sugeneruotos TS automatiškai sukurk Priedo Nr. 1 atitikties lentelę. Ji turi turėti:
-- Nr.: TS punkto numeris
-- Reikalavimas: aiški šio punkto santrauka
-- Tiekėjo siūlomas sprendimas: TUŠČIA (pildys tiekėjas)
-- Atitikimo įrodymas (dokumentas/punktas): TUŠČIA
-- Atitinka: TUŠČIA (Taip/Ne)
-
-GRĄŽINK TIK VALID JSON (be markdown), maždaug 4000-6000 žodžių TS:
+GRĄŽINK TIK VALID JSON (be markdown, be paaiškinimo):
 {
   "title": "Galutinis TS pavadinimas",
-  "sections": [
-    {
-      "number": "1",
-      "title": "Bendrosios nuostatos",
-      "content": "Markdown formatuotas turinys su paragraphais, sąrašais, lentelėmis"
-    }
-  ],
-  "complianceTable": [
-    {
-      "ref": "3.1.1",
-      "requirement": "Sutrumpintas reikalavimo tekstas",
-      "category": "technical|quality|delivery|warranty|qualification|other"
-    }
+  "sectionTitles": [
+    {"number": "1", "title": "Bendrosios nuostatos"},
+    {"number": "2", "title": "Pirkimo objekto aprašymas"},
+    {"number": "3", "title": "Techniniai reikalavimai"},
+    {"number": "4", "title": "Kokybės reikalavimai ir standartai"},
+    {"number": "5", "title": "Pristatymas, atlikimas ir terminai"},
+    {"number": "6", "title": "Garantijos sąlygos"},
+    {"number": "7", "title": "Sutarties vykdymo užtikrinimas"}
   ],
   "evaluationCriteria": [
-    {
-      "name": "Kainos kriterijus",
-      "weight": 60,
-      "formula": "Bk = (Cmin/C) × 60",
-      "description": "Aprašymas, kaip skaičiuojami balai"
-    }
+    {"name": "Kainos kriterijus", "weight": 60, "formula": "Bk = (Cmin/C) * 60", "description": "Žemiausia kaina gauna max balus."}
   ],
   "keyElements": {
-    "cpv": "siūlomas pagrindinis CPV kodas",
-    "additionalCpv": ["papildomi CPV kodai"],
-    "standards": ["ISO 9001", "IEC 62443-3-3 SL2", "..."],
-    "warranty": "Garantijos terminas ir aprėptis (1 sakinys)",
+    "cpv": "siūlomas pagrindinis CPV",
+    "additionalCpv": [],
+    "standards": ["ISO/IEC/EN standartų sąrašas"],
+    "warranty": "Garantijos terminas (1 sakinys)",
     "penalty": "Delspinigių dydis (1 sakinys)"
   },
-  "recommendations": ["1 rekomendacija dėl šio konkretaus pirkimo", "2 rekomendacija", "..."]
+  "recommendations": ["2-4 konkrečios rekomendacijos šiam pirkimui"]
 }`;
 
-    onProgress?.('Generuojama pilna TS...', 50);
-    const content = await callClaude(userMsg, settings, 16000);
-    onProgress?.('Apdorojama...', 90);
+    const content = await callClaude(userMsg, settings, 4000);
     return parseJson(content);
+  }
+
+  async function generateSectionContent(section, idx, ctx, settings) {
+    const { meta, answersBlock, refsBlock } = ctx;
+    const userMsg = `Sugeneruok TS skyriaus "${section.number}. ${section.title}" PILNĄ turinį markdown formatu.
+
+Pirkimas: ${meta.title} (${meta.type})
+Kiekis: ${meta.quantity || '-'} ${meta.unit || ''}
+Trukmė: ${meta.duration || '-'} mėn.
+Vieta: ${meta.location || '-'}
+Specialūs reikalavimai: ${meta.special || '-'}
+
+Vartotojo atsakymai:
+${answersBlock || '(nieko)'}
+
+${refsBlock ? 'Analogiški TS fragmentai (tik kaip kontekstas):\n' + refsBlock.slice(0, 2000) : ''}
+
+UŽDUOTIS: Parašyk SKYRIAUS "${section.number}. ${section.title}" pilną turinį.
+
+Reikalavimai:
+- Markdown formatu, apie 300-500 žodžių
+- Naudok numeruotas pasubsekcijas: ${section.number}.1., ${section.number}.2., ir t.t.
+- Kiekvienas reikalavimas turi turėti unikalų numerį
+- Naudok matuojamus parametrus (NE "kokybiškas", o "atitinkantis ISO 9001")
+- Įtrauk standartus (ISO/IEC/EN/LST EN) kai taikoma
+- Jei mini prekės ženklą - PRIVALOMA "arba lygiavertis"
+- Atitik PĮ reikalavimus
+
+GRĄŽINK TIK MARKDOWN turinį (NE JSON, NE markdown code fence \`\`\`). Pradėk tiesiogiai nuo "${section.number}.1." pasubsekcijos.`;
+
+    const content = await callClaude(userMsg, settings, 3000);
+    return content.replace(/^```(?:markdown)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+  }
+
+  async function generateCompliance(sections, ctx, settings) {
+    const sectionsList = sections.map(s => `${s.number}. ${s.title}`).join('\n');
+    const sectionsBrief = sections.map(s => {
+      // Pirmi 300 simbolių kiekvieno skyriaus turinio
+      return `${s.number}. ${s.title}:\n${(s.content || '').slice(0, 300)}`;
+    }).join('\n\n');
+
+    const userMsg = `TS struktūra ir santrauka:
+${sectionsBrief.slice(0, 4000)}
+
+Pirkimas: ${ctx.meta.title}
+
+UŽDUOTIS: Sugeneruok Priedo Nr. 1 atitikties lentelės eilutes - 15-25 svarbiausius matuojamus reikalavimus iš visos TS.
+
+GRĄŽINK TIK VALID JSON (be markdown):
+{
+  "items": [
+    {"ref": "3.1.1", "requirement": "Trumpas matuojamas reikalavimas", "category": "technical"},
+    {"ref": "3.2.1", "requirement": "...", "category": "quality"}
+  ]
+}
+
+Kategorijos: technical, quality, delivery, warranty, qualification, security, other.`;
+
+    const content = await callClaude(userMsg, settings, 4000);
+    const result = parseJson(content);
+    return result.items || result.complianceTable || [];
   }
 
   async function callClaude(userMessage, settings, maxTokens = 8000) {
