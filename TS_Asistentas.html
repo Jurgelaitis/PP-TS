@@ -2182,10 +2182,20 @@ details[open] summary {
                   <svg class="title-icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                   Analizės santrauka
                 </h2>
-                <button class="btn btn-secondary btn-sm" onclick="App.runAnalysis()">
-                  <svg class="ico" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-                  Pakartoti
-                </button>
+                <div class="flex flex-gap-1" style="flex-wrap: wrap;">
+                  <button class="btn btn-secondary btn-sm hidden" id="btnBackToGen" onclick="App.backToGenerationTab()">
+                    <svg class="ico" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+                    Grįžti į TS
+                  </button>
+                  <button class="btn btn-primary btn-sm hidden" id="btnApplyRecs" onclick="App.applyAnalysisRecommendations()">
+                    <svg class="ico" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    Pritaikyti rekomendacijas į TS
+                  </button>
+                  <button class="btn btn-secondary btn-sm" onclick="App.runAnalysis()">
+                    <svg class="ico" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                    Pakartoti
+                  </button>
+                </div>
               </div>
               <p id="analysisSummary" class="card-subtitle"></p>
               <div class="metric-grid mt-2">
@@ -2450,6 +2460,7 @@ details[open] summary {
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://unpkg.com/docx@9.5.0/build/index.umd.js"></script>
 <script>
   if (window.pdfjsLib) {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -2844,6 +2855,15 @@ const App = (() => {
     if (!state.analysis) return;
     $('#analysisEmpty').classList.add('hidden');
     $('#analysisResults').classList.remove('hidden');
+
+    // Parodyti TS navigation mygtukus tik jei egzistuoja sugeneruota TS
+    const hasGeneratedTs = !!(gen && gen.ts && gen.ts.sections && gen.ts.sections.length);
+    const backBtn = $('#btnBackToGen');
+    const applyBtn = $('#btnApplyRecs');
+    if (backBtn) backBtn.classList.toggle('hidden', !hasGeneratedTs);
+    // "Pritaikyti rekomendacijas" rodome tik jei yra TS IR yra ką taikyti (critical/major issues)
+    const hasApplicable = hasGeneratedTs && state.analysis.issues.some(i => i.severity === 'critical' || i.severity === 'major');
+    if (applyBtn) applyBtn.classList.toggle('hidden', !hasApplicable);
 
     const a = state.analysis;
     $('#analysisSummary').textContent = a.summary;
@@ -3551,16 +3571,25 @@ const App = (() => {
   }
 
   function renderGeneratedTs() {
-    const html = DocxBuilder.mdToHtml((gen.ts.sections || []).map(s => `## ${s.number}. ${s.title}\n\n${s.content}`).join('\n\n'));
-    $('#genTsPreview').innerHTML = `<h1>${escapeHtml(gen.ts.title || gen.meta.title)}</h1>` + html;
+    // Filtruoti nepavyksinusius skyrius - jie nerodomi UI
+    const validSections = (gen.ts.sections || []).filter(s => !s._failed && (s.content || '').trim());
+    const html = DocxBuilder.mdToHtml(validSections.map(s => `## ${s.number}. ${s.title}\n\n${s.content}`).join('\n\n'));
+    const failedCount = (gen.ts.sections || []).filter(s => s._failed).length;
+    const failedNote = failedCount > 0
+      ? `<div class="alert alert-warning mt-2" style="font-size: 13px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><div>${failedCount} skyrius nesugeneravo (rate limit). Spauskite „Pergeneruoti" arba pridėkite rankiniu būdu.</div></div>`
+      : '';
+    $('#genTsPreview').innerHTML = `<h1>${escapeHtml(gen.ts.title || gen.meta.title)}</h1>` + html + failedNote;
   }
 
   function renderCompliance() {
     const items = gen.ts.complianceTable || [];
+    // Surasti kortelę kuri apgaubia priedo lentelę - jei tuščia, slėpsime kortelę visą
+    const card = $('#genCompliancePreview')?.closest('.card');
     if (!items.length) {
-      $('#genCompliancePreview').innerHTML = '<p class="card-subtitle"><em>Atitikties lentelė nesugeneruota.</em></p>';
+      if (card) card.classList.add('hidden');
       return;
     }
+    if (card) card.classList.remove('hidden');
     $('#genCompliancePreview').innerHTML = `
       <table>
         <thead>
@@ -3703,12 +3732,26 @@ const App = (() => {
     setTimeout(() => runAnalysis(), 500);
   }
 
-  function exportGeneratedDocx() {
+  async function exportGeneratedDocx() {
     if (!gen.ts) return toast('Pirmiausia sugeneruokite TS.', 'error');
-    const html = DocxBuilder.buildTsDocx(gen.ts, gen.meta, gen.priceData);
     const safeTitle = (gen.meta.title || 'TS').replace(/[^a-zA-Z0-9_Ā-ſ\s]/g, '').slice(0, 60).trim().replace(/\s+/g, '_');
-    DocxBuilder.download(html, `${safeTitle}_${Date.now()}.doc`);
-    toast('DOCX failas atsisiunčiamas...', 'success');
+    const filename = `${safeTitle}_${Date.now()}`;
+    try {
+      // Bandymas - tikras .docx per docx.js
+      if (window.docx && DocxBuilder.buildAndDownloadRealDocx) {
+        toast('Generuojamas .docx failas...', 'info');
+        await DocxBuilder.buildAndDownloadRealDocx(gen.ts, gen.meta, gen.priceData, filename);
+        toast('.docx failas atsisiunčiamas.', 'success');
+        return;
+      }
+      throw new Error('docx.js biblioteka neįkrauta');
+    } catch (err) {
+      console.warn('Tikras .docx nepavyko, naudojama HTML-as-Word atsarginė versija:', err.message);
+      // Fallback - senasis HTML-as-Word .doc
+      const html = DocxBuilder.buildTsDocx(gen.ts, gen.meta, gen.priceData);
+      DocxBuilder.download(html, `${filename}.doc`);
+      toast('Atsisiunčiamas .doc formatas (atsarginė versija).', 'info');
+    }
   }
 
   function exportGeneratedMd() {
@@ -3738,6 +3781,95 @@ const App = (() => {
     toast('Pradedamas naujas pirkimas.', 'info');
   }
 
+  // === NAVIGATION TARP ANALIZĖS IR GENERAVIMO ===
+  function backToGenerationTab() {
+    if (!gen.ts || !gen.ts.sections || !gen.ts.sections.length) {
+      toast('Nėra sugeneruotos TS, į kurią grįžti.', 'error');
+      return;
+    }
+    switchTab('generate');
+    goToStep(4);
+    // Užtikrinti, kad rezultatų panelė matoma
+    $('#genFullLoading').classList.add('hidden');
+    $('#genResultPanel').classList.remove('hidden');
+    toast('Grįžtama į sugeneruotą TS.', 'info');
+  }
+
+  // === AUTO-PRITAIKYTI ANALIZĖS REKOMENDACIJAS Į SUGENERUOTĄ TS ===
+  async function applyAnalysisRecommendations() {
+    if (!gen.ts || !gen.ts.sections || !gen.ts.sections.length) {
+      toast('Nėra sugeneruotos TS.', 'error');
+      return;
+    }
+    if (!state.analysis || !state.analysis.issues || !state.analysis.issues.length) {
+      toast('Nėra analizės rezultatų. Pirma paleiskite analizę.', 'error');
+      return;
+    }
+    const criticalAndMajor = state.analysis.issues.filter(i => i.severity === 'critical' || i.severity === 'major');
+    if (!criticalAndMajor.length) {
+      toast('Nėra kritinių ar reikšmingų pastabų, kurias verta taikyti.', 'info');
+      return;
+    }
+
+    const confirmed = confirm(
+      `AI pritaikys ${criticalAndMajor.length} kritinių/reikšmingų pastabų į sugeneruotą TS.\n\n` +
+      `Tai užtruks 1–2 min. Esama TS versija bus pakeista (galite vis tiek redaguoti rankiniu būdu).\n\n` +
+      `Tęsti?`
+    );
+    if (!confirmed) return;
+
+    // Naudoti tą patį progress UI kaip generavime - pereiname į generavimo skirtuką
+    switchTab('generate');
+    goToStep(4);
+    $('#genFullLoading').classList.remove('hidden');
+    $('#genResultPanel').classList.add('hidden');
+    $('#btnGoToExport').disabled = true;
+    $('#btnSendToAnalysis').disabled = true;
+
+    const setProg = (label, pct) => {
+      $('#genProgressBar').style.width = pct + '%';
+      $('#genProgressLabel').textContent = label;
+    };
+    setProg('Pradedamas automatinis pritaikymas...', 5);
+
+    try {
+      const updatedTs = await TSGenerator.applyRecommendations(
+        gen.ts,
+        state.analysis.issues,
+        gen.meta,
+        state.settings,
+        setProg
+      );
+      gen.ts = updatedTs;
+
+      setProg('Atnaujinama TS peržiūra...', 95);
+      renderGeneratedTs();
+      renderCompliance();
+      renderKeyElements();
+      renderGenRecommendations();
+      renderFinalPreview();
+
+      $('#genFullLoading').classList.add('hidden');
+      $('#genResultPanel').classList.remove('hidden');
+      $('#btnGoToExport').disabled = false;
+      $('#btnSendToAnalysis').disabled = false;
+
+      const applied = updatedTs._appliedRecommendations || {};
+      toast(
+        `✓ Pritaikyta ${applied.totalIssuesApplied || criticalAndMajor.length} rekomendacijų ` +
+        `${applied.sectionsUpdated || '?'} skyriuose. Pakartokite analizę patikrinimui.`,
+        'success'
+      );
+    } catch (err) {
+      console.error(err);
+      toast('Klaida pritaikant rekomendacijas: ' + err.message, 'error');
+      $('#genFullLoading').classList.add('hidden');
+      $('#genResultPanel').classList.remove('hidden');
+      $('#btnGoToExport').disabled = false;
+      $('#btnSendToAnalysis').disabled = false;
+    }
+  }
+
   // === EXPORT ===
   return {
     init,
@@ -3758,6 +3890,8 @@ const App = (() => {
     // CVP IS realūs duomenys
     fetchAnalogues, refetchAnalogues, refilterAnalogues,
     toggleAnalogue, selectAllAnalogues, deselectAllAnalogues,
+    // Navigation tarp analizės ir generavimo + auto-apply
+    backToGenerationTab, applyAnalysisRecommendations,
   };
 })();
 
@@ -4363,22 +4497,32 @@ window.repairTruncatedJson = repairTruncatedJson;
 window.smartParseJson = smartParseJson;
 
 // ---------- BENDRAS FETCH SU RETRY (429 rate limit handling) ----------
-async function fetchWithRetry(endpoint, options, maxRetries = 4) {
+// Backend gali wrap'inti Anthropic 429 į 500 statusą, todėl tikrinama ir body
+async function fetchWithRetry(endpoint, options, maxRetries = 5) {
   let lastError = null;
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
       const response = await fetch(endpoint, options);
       // Sėkmė - grąžinti
       if (response.ok) return response;
-      // 429 (rate limit) ar 503 (service unavailable) - laukti ir bandyti dar kartą
-      if ((response.status === 429 || response.status === 503) && attempt < maxRetries - 1) {
-        // Patikrinti Retry-After header
+
+      // Tikrinti rate limit: pagal status arba pagal body turinį
+      const cloned = response.clone();
+      let bodyText = '';
+      try { bodyText = await cloned.text(); } catch (_) {}
+
+      const isRateLimit = response.status === 429 ||
+                          response.status === 503 ||
+                          /\b429\b|rate[_\s]?limit|too[_\s]?many[_\s]?requests|overloaded/i.test(bodyText);
+
+      if (isRateLimit && attempt < maxRetries - 1) {
         const retryAfter = response.headers.get('retry-after');
         let waitMs;
         if (retryAfter) {
           waitMs = parseInt(retryAfter) * 1000;
         } else {
-          waitMs = Math.min(60000, Math.pow(2, attempt) * 2000 + Math.random() * 1000);
+          // Eksponentinis backoff su jitter: 5s, 10s, 20s, 40s
+          waitMs = Math.min(60000, Math.pow(2, attempt) * 5000 + Math.random() * 2000);
         }
         console.warn(`API rate limit (${response.status}), pakartojama po ${Math.round(waitMs/1000)}s... (${attempt+1}/${maxRetries})`);
         await new Promise(r => setTimeout(r, waitMs));
@@ -4388,7 +4532,6 @@ async function fetchWithRetry(endpoint, options, maxRetries = 4) {
       return response;
     } catch (err) {
       lastError = err;
-      // Network klaida - retry tik jei dar liko bandymų
       if (attempt < maxRetries - 1) {
         const waitMs = Math.pow(2, attempt) * 1500;
         console.warn(`Network klaida, pakartojama po ${Math.round(waitMs/1000)}s...`, err.message);
@@ -4702,20 +4845,48 @@ KIEKVIENAS klausimas - trumpas, hint - max 1 sakinys. Bendras atsakymas < 4000 �
 
     const sectionPromises = sectionTitles.map((section, idx) =>
       generateSectionContent(section, idx, ctx, settings)
-        .then(content => ({ number: section.number, title: section.title, content }))
+        .then(content => ({ number: section.number, title: section.title, content, _failed: false }))
         .catch(err => {
-          console.error(`Skyrius ${section.number} nepavyko:`, err);
-          return { number: section.number, title: section.title, content: `*(Šis skyrius nesugeneruotas: ${err.message}. Galite redaguoti rankiniu būdu.)*` };
+          console.error(`Skyrius ${section.number} nepavyko (pirmoji banga):`, err);
+          return { number: section.number, title: section.title, content: '', _failed: true, _error: err.message };
         })
     );
-    const sections = await Promise.all(sectionPromises);
+    let sections = await Promise.all(sectionPromises);
 
-    // ŽINGSNIS 3: Atitikties lentelė, 30-60 sek
+    // Pakartotinis bandymas nepavyksinusiems skyriams sekvenciškai su delay (kad išvengti rate limit'o)
+    const failedSections = sections.filter(s => s._failed);
+    if (failedSections.length > 0) {
+      onProgress?.(`Pakartojami ${failedSections.length} nepavykę skyriai...`, 65);
+      for (let i = 0; i < failedSections.length; i++) {
+        const s = failedSections[i];
+        await new Promise(r => setTimeout(r, 3000 + i * 2000)); // delay tarp bandymų
+        try {
+          const content = await generateSectionContent(s, 0, ctx, settings);
+          const idx = sections.findIndex(x => x.number === s.number);
+          if (idx >= 0) sections[idx] = { number: s.number, title: s.title, content, _failed: false };
+        } catch (err) {
+          console.warn(`Skyrius ${s.number} ir antrame bandyme nepavyko:`, err.message);
+          // paliekame _failed: true - bus filtruojamas iš output
+        }
+      }
+    }
+
+    // ŽINGSNIS 3: Atitikties lentelė (su pakartotinu bandymu)
     onProgress?.('3/3: Generuojama atitikties lentelė...', 80);
-    const complianceTable = await generateCompliance(sections, ctx, settings).catch(err => {
-      console.warn('Atitikties lentelė nepavyko:', err);
-      return [];
-    });
+    let complianceTable = [];
+    try {
+      complianceTable = await generateCompliance(sections.filter(s => !s._failed), ctx, settings);
+    } catch (err) {
+      console.warn('Atitikties lentelė pirmame bandyme nepavyko:', err.message);
+      // Antras bandymas su delay
+      await new Promise(r => setTimeout(r, 5000));
+      try {
+        complianceTable = await generateCompliance(sections.filter(s => !s._failed), ctx, settings);
+      } catch (err2) {
+        console.warn('Atitikties lentelė nepavyko:', err2.message);
+        complianceTable = [];
+      }
+    }
 
     onProgress?.('Atlikta', 95);
     return {
@@ -4892,7 +5063,8 @@ Kategorijos: technical, quality, delivery, warranty, qualification, security, ot
     if (!ts) return '';
     let md = `# ${ts.title || 'Techninė specifikacija'}\n\n`;
 
-    (ts.sections || []).forEach(s => {
+    // Filtruoti tik sėkmingai sugeneruotus skyrius - nepavyksinę nerodomi
+    (ts.sections || []).filter(s => !s._failed && (s.content || '').trim()).forEach(s => {
       md += `## ${s.number}. ${s.title}\n\n${s.content}\n\n`;
     });
 
@@ -5301,12 +5473,17 @@ const DocxBuilder = (() => {
 
   function buildTsDocx(ts, meta, priceData) {
     const date = new Date().toLocaleDateString('lt-LT');
-    const sections = (ts.sections || []).map(s => {
+    // Filtruoti tik sėkmingai sugeneruotus skyrius
+    const validSections = (ts.sections || []).filter(s => !s._failed && (s.content || '').trim());
+    const sections = validSections.map(s => {
       const content = mdToHtml(s.content);
       return `<h2 style="color:#00A072; font-size:16pt; margin-top:24pt; margin-bottom:12pt; border-bottom: 1pt solid #00A072; padding-bottom: 4pt;">${escapeHtml(s.number)}. ${escapeHtml(s.title)}</h2>${content}`;
     }).join('\n');
 
-    const compliance = buildComplianceTable(ts.complianceTable || []);
+    // Atitikties lentelė: tik jei yra duomenų - kitu atveju neįtraukiame Priedo Nr. 1
+    const complianceItems = ts.complianceTable || [];
+    const hasCompliance = complianceItems.length > 0;
+    const compliance = hasCompliance ? buildComplianceTable(complianceItems) : '';
     const evalCriteria = buildEvaluationTable(ts.evaluationCriteria || []);
 
     const css = `
@@ -5404,6 +5581,7 @@ ${evalCriteria}
 
 ${priceBlock}
 
+${hasCompliance ? `
 <div class="page-break"></div>
 
 <h1 style="text-align: center; margin-bottom: 12pt;">Priedas Nr. 1</h1>
@@ -5411,6 +5589,7 @@ ${priceBlock}
 <p>Tiekėjas privalo užpildyti šią lentelę pažymėdamas atitikimą kiekvienam techninės specifikacijos reikalavimui ir nurodydamas įrodymo šaltinį (techninių aprašų dokumentas, sertifikatas, bandymo protokolas, gamintojo specifikacija ir pan.).</p>
 
 ${compliance}
+` : ''}
 
 <div class="footer">
 Dokumentą sugeneravo TS Asistentas (Litgrid AB) · ${date}<br/>
@@ -5529,8 +5708,370 @@ ${rows}
     document.body.removeChild(a);
   }
 
+  // -------- TIKRAS .docx GENERAVIMAS PER docx.js BIBLIOTEKĄ --------
+  // Naudoja Office Open XML formatą (tikras .docx, ne HTML-as-Word)
+  async function buildAndDownloadRealDocx(ts, meta, priceData, filename) {
+    if (!window.docx) {
+      throw new Error('docx.js biblioteka neįkrauta. Patikrinkite interneto prieigą.');
+    }
+    const D = window.docx;
+    const children = [];
+
+    // ===== TITULINIS PUSLAPIS =====
+    children.push(new D.Paragraph({
+      alignment: D.AlignmentType.CENTER,
+      spacing: { before: 2400, after: 240 },
+      children: [new D.TextRun({ text: 'LITGRID AB', size: 22, color: '737483', characterSpacing: 100 })]
+    }));
+    children.push(new D.Paragraph({
+      alignment: D.AlignmentType.CENTER,
+      spacing: { after: 360 },
+      children: [new D.TextRun({ text: ts.title || meta.title || 'Techninė specifikacija', bold: true, size: 56 })]
+    }));
+    children.push(new D.Paragraph({
+      alignment: D.AlignmentType.CENTER,
+      spacing: { after: 120 },
+      children: [new D.TextRun({ text: 'Pirkimo techninė specifikacija', size: 28, color: '737483' })]
+    }));
+    if (meta.cpv) {
+      children.push(new D.Paragraph({
+        alignment: D.AlignmentType.CENTER,
+        spacing: { after: 120 },
+        children: [new D.TextRun({ text: 'CPV: ' + meta.cpv, size: 24, color: '737483' })]
+      }));
+    }
+    children.push(new D.Paragraph({
+      alignment: D.AlignmentType.CENTER,
+      spacing: { before: 720, after: 240 },
+      children: [new D.TextRun({ text: new Date().toLocaleDateString('lt-LT'), size: 24, color: '737483' })]
+    }));
+
+    // Page break
+    children.push(new D.Paragraph({ children: [new D.PageBreak()] }));
+
+    // ===== PIRKIMO INFORMACIJOS LENTELĖ =====
+    children.push(new D.Paragraph({
+      heading: D.HeadingLevel.HEADING_1,
+      spacing: { before: 240, after: 240 },
+      children: [new D.TextRun({ text: 'Pirkimo informacija', color: '00A072', bold: true })]
+    }));
+
+    const infoRows = [
+      ['Pirkimo pavadinimas', meta.title || '—'],
+      ['Objekto tipas', { goods: 'Prekės', services: 'Paslaugos', works: 'Darbai', mixed: 'Mišrios' }[meta.type] || '—'],
+      ['CPV kodas', meta.cpv || '—'],
+      ['Kiekis', (meta.quantity || '—') + ' ' + (meta.unit || '')],
+      ['Sutarties trukmė', meta.duration ? meta.duration + ' mėn.' : '—'],
+      ['Atlikimo vieta', meta.location || '—'],
+      ['Vertinimo kriterijus', { price: 'Mažiausia kaina', cost: 'Sąnaudos (gyvavimo ciklas)', best_price_quality: 'Ekonomiškai naudingiausias' }[meta.criteria] || '—']
+    ];
+    children.push(buildDocxKvTable(D, infoRows));
+
+    // Bendros nuostatos
+    children.push(new D.Paragraph({
+      spacing: { before: 240, after: 120 },
+      shading: { type: D.ShadingType.SOLID, color: 'EFF9F1' },
+      border: { left: { style: D.BorderStyle.SINGLE, size: 12, color: '00A072', space: 4 } },
+      children: [new D.TextRun({ text: 'Bendros nuostatos: ', bold: true }), new D.TextRun({ text: 'Ši specifikacija parengta vadovaujantis LR Pirkimų, atliekamų vandentvarkos, energetikos, transporto ar pašto paslaugų srities perkančiųjų subjektų įstatymu (PĮ), ES Direktyva 2014/25/ES, Viešųjų pirkimų tarnybos rekomendacijomis ir Litgrid AB vidaus tvarkomis. Visi techniniai reikalavimai yra minimalūs — tiekėjas gali pasiūlyti aukštesnio lygio sprendimą.' })]
+    }));
+
+    // ===== TS SKYRIAI =====
+    const validSections = (ts.sections || []).filter(s => !s._failed && (s.content || '').trim());
+    for (const section of validSections) {
+      children.push(new D.Paragraph({
+        heading: D.HeadingLevel.HEADING_1,
+        spacing: { before: 360, after: 180 },
+        border: { bottom: { style: D.BorderStyle.SINGLE, size: 8, color: '00A072' } },
+        children: [new D.TextRun({ text: section.number + '. ' + section.title, color: '00A072', bold: true })]
+      }));
+      const contentElements = mdToDocxElements(D, section.content || '');
+      children.push(...contentElements);
+    }
+
+    // ===== VERTINIMO KRITERIJAI =====
+    const evalCrit = ts.evaluationCriteria || [];
+    if (evalCrit.length) {
+      children.push(new D.Paragraph({
+        heading: D.HeadingLevel.HEADING_1,
+        spacing: { before: 360, after: 180 },
+        children: [new D.TextRun({ text: 'Pasiūlymų vertinimo kriterijai', color: '00A072', bold: true })]
+      }));
+      children.push(buildDocxEvalTable(D, evalCrit));
+    }
+
+    // ===== KAINOS VERTINIMAS =====
+    if (priceData) {
+      children.push(new D.Paragraph({ children: [new D.PageBreak()] }));
+      children.push(new D.Paragraph({
+        heading: D.HeadingLevel.HEADING_1,
+        spacing: { before: 240, after: 180 },
+        children: [new D.TextRun({ text: 'Numatoma pirkimo vertė', color: '00A072', bold: true })]
+      }));
+      if (priceData.rationale) {
+        children.push(new D.Paragraph({
+          spacing: { after: 240 },
+          children: [new D.TextRun({ text: priceData.rationale })]
+        }));
+      }
+      const e = priceData.estimate || {};
+      const fmt = n => n != null ? Number(n).toLocaleString('lt-LT', { maximumFractionDigits: 0 }) : '—';
+      const priceRows = [
+        ['Centrinis įvertinimas', fmt(e.central) + ' EUR (be PVM)'],
+        ['Minimumas', fmt(e.min) + ' EUR'],
+        ['Maksimumas', fmt(e.max) + ' EUR']
+      ];
+      if (e.perUnit) priceRows.push(['Vieneto kaina', fmt(e.perUnit) + ' EUR']);
+      if (e.confidence) priceRows.push(['Patikimumas', { high: 'Aukštas', medium: 'Vidutinis', low: 'Žemas' }[e.confidence] || e.confidence]);
+      children.push(buildDocxKvTable(D, priceRows));
+
+      if (priceData.sources && priceData.sources.length) {
+        children.push(new D.Paragraph({
+          heading: D.HeadingLevel.HEADING_2,
+          spacing: { before: 240, after: 120 },
+          children: [new D.TextRun({ text: 'Šaltiniai', color: '2E3641', bold: true })]
+        }));
+        priceData.sources.forEach(s => {
+          children.push(new D.Paragraph({
+            bullet: { level: 0 },
+            children: [new D.TextRun({ text: s.title + ' — ', bold: true }), new D.TextRun({ text: s.description || '' })]
+          }));
+        });
+      }
+      if (priceData.recommendations && priceData.recommendations.length) {
+        children.push(new D.Paragraph({
+          heading: D.HeadingLevel.HEADING_2,
+          spacing: { before: 240, after: 120 },
+          children: [new D.TextRun({ text: 'Rekomendacijos', color: '2E3641', bold: true })]
+        }));
+        priceData.recommendations.forEach(r => {
+          children.push(new D.Paragraph({ bullet: { level: 0 }, children: [new D.TextRun({ text: r })] }));
+        });
+      }
+    }
+
+    // ===== ATITIKTIES LENTELĖ (tik jei yra duomenų) =====
+    const compItems = ts.complianceTable || [];
+    if (compItems.length > 0) {
+      children.push(new D.Paragraph({ children: [new D.PageBreak()] }));
+      children.push(new D.Paragraph({
+        alignment: D.AlignmentType.CENTER,
+        spacing: { before: 240, after: 120 },
+        children: [new D.TextRun({ text: 'Priedas Nr. 1', bold: true, size: 36 })]
+      }));
+      children.push(new D.Paragraph({
+        alignment: D.AlignmentType.CENTER,
+        spacing: { after: 240 },
+        children: [new D.TextRun({ text: 'Atitikties lentelė', color: '00A072', bold: true, size: 32 })]
+      }));
+      children.push(new D.Paragraph({
+        spacing: { after: 240 },
+        children: [new D.TextRun({ text: 'Tiekėjas privalo užpildyti šią lentelę pažymėdamas atitikimą kiekvienam techninės specifikacijos reikalavimui ir nurodydamas įrodymo šaltinį (techninių aprašų dokumentas, sertifikatas, bandymo protokolas, gamintojo specifikacija ir pan.).' })]
+      }));
+      children.push(buildDocxComplianceTable(D, compItems));
+    }
+
+    // ===== FOOTER =====
+    children.push(new D.Paragraph({
+      alignment: D.AlignmentType.CENTER,
+      spacing: { before: 720, after: 120 },
+      border: { top: { style: D.BorderStyle.SINGLE, size: 4, color: 'C7CDD3' } },
+      children: [new D.TextRun({ text: 'Dokumentą sugeneravo TS Asistentas (Litgrid AB) · ' + new Date().toLocaleDateString('lt-LT'), color: '737483', size: 18 })]
+    }));
+    children.push(new D.Paragraph({
+      alignment: D.AlignmentType.CENTER,
+      children: [new D.TextRun({ text: 'Šis dokumentas yra juodraštis ir turi būti peržiūrėtas pirkimų komisijos prieš skelbiant pirkimą.', color: '737483', size: 18, italics: true })]
+    }));
+
+    // Sukuriam dokumentą su stiliais
+    const doc = new D.Document({
+      creator: 'TS Asistentas · Litgrid AB',
+      title: ts.title || meta.title || 'Techninė specifikacija',
+      description: 'Sugeneruota TS Asistentu',
+      styles: {
+        default: {
+          document: {
+            run: { font: 'Calibri', size: 22 }
+          }
+        }
+      },
+      sections: [{
+        properties: {
+          page: {
+            margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 }
+          }
+        },
+        children
+      }]
+    });
+
+    const blob = await D.Packer.toBlob(doc);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename.replace(/\.(doc|docx)$/i, '') + '.docx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  // -------- HELPER: konvertuoja markdown turinį į docx Paragraph elementus --------
+  function mdToDocxElements(D, md) {
+    if (!md) return [];
+    const elements = [];
+    const lines = md.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      // Antraštės
+      if (/^####\s+/.test(trimmed)) {
+        elements.push(new D.Paragraph({
+          heading: D.HeadingLevel.HEADING_4,
+          spacing: { before: 180, after: 60 },
+          children: parseInlineRuns(D, trimmed.replace(/^####\s+/, ''))
+        }));
+        continue;
+      }
+      if (/^###\s+/.test(trimmed)) {
+        elements.push(new D.Paragraph({
+          heading: D.HeadingLevel.HEADING_3,
+          spacing: { before: 240, after: 80 },
+          children: parseInlineRuns(D, trimmed.replace(/^###\s+/, ''))
+        }));
+        continue;
+      }
+      if (/^##\s+/.test(trimmed)) {
+        elements.push(new D.Paragraph({
+          heading: D.HeadingLevel.HEADING_2,
+          spacing: { before: 280, after: 100 },
+          children: parseInlineRuns(D, trimmed.replace(/^##\s+/, ''))
+        }));
+        continue;
+      }
+      if (/^#\s+/.test(trimmed)) {
+        elements.push(new D.Paragraph({
+          heading: D.HeadingLevel.HEADING_2,
+          spacing: { before: 280, after: 100 },
+          children: parseInlineRuns(D, trimmed.replace(/^#\s+/, ''))
+        }));
+        continue;
+      }
+      // Sąrašai
+      if (/^[-*]\s+/.test(trimmed)) {
+        elements.push(new D.Paragraph({
+          bullet: { level: 0 },
+          spacing: { before: 40, after: 40 },
+          children: parseInlineRuns(D, trimmed.replace(/^[-*]\s+/, ''))
+        }));
+        continue;
+      }
+      if (/^\d+\.\s+/.test(trimmed)) {
+        elements.push(new D.Paragraph({
+          spacing: { before: 40, after: 40 },
+          children: parseInlineRuns(D, trimmed)
+        }));
+        continue;
+      }
+      // Įprasta pastraipa
+      elements.push(new D.Paragraph({
+        spacing: { before: 80, after: 80 },
+        children: parseInlineRuns(D, trimmed)
+      }));
+    }
+    return elements;
+  }
+
+  // -------- HELPER: parsuoja **bold**, *italic* į docx TextRun masyvą --------
+  function parseInlineRuns(D, text) {
+    if (!text) return [new D.TextRun('')];
+    const runs = [];
+    // Pirmiausia **bold**, paskui *italic*
+    const tokens = text.split(/(\*\*[^*]+\*\*|\*[^*\n]+\*)/g);
+    for (const tok of tokens) {
+      if (!tok) continue;
+      if (/^\*\*[^*]+\*\*$/.test(tok)) {
+        runs.push(new D.TextRun({ text: tok.slice(2, -2), bold: true }));
+      } else if (/^\*[^*\n]+\*$/.test(tok)) {
+        runs.push(new D.TextRun({ text: tok.slice(1, -1), italics: true }));
+      } else {
+        runs.push(new D.TextRun(tok));
+      }
+    }
+    return runs.length ? runs : [new D.TextRun(text)];
+  }
+
+  // -------- HELPER: pavadinimas-reikšmė lentelė (info, kaina) --------
+  function buildDocxKvTable(D, rows) {
+    return new D.Table({
+      width: { size: 100, type: D.WidthType.PERCENTAGE },
+      rows: rows.map(([k, v]) => new D.TableRow({
+        children: [
+          new D.TableCell({
+            width: { size: 35, type: D.WidthType.PERCENTAGE },
+            shading: { type: D.ShadingType.SOLID, color: 'EFF1F1' },
+            children: [new D.Paragraph({ children: [new D.TextRun({ text: k, bold: true })] })]
+          }),
+          new D.TableCell({
+            width: { size: 65, type: D.WidthType.PERCENTAGE },
+            children: [new D.Paragraph({ children: [new D.TextRun({ text: v })] })]
+          })
+        ]
+      }))
+    });
+  }
+
+  // -------- HELPER: vertinimo kriterijų lentelė --------
+  function buildDocxEvalTable(D, criteria) {
+    const headerRow = new D.TableRow({
+      tableHeader: true,
+      children: ['Kriterijus', 'Svoris', 'Formulė', 'Aprašymas'].map(t => new D.TableCell({
+        shading: { type: D.ShadingType.SOLID, color: 'D7EEDB' },
+        children: [new D.Paragraph({ children: [new D.TextRun({ text: t, bold: true })] })]
+      }))
+    });
+    const dataRows = criteria.map(c => new D.TableRow({
+      children: [
+        new D.TableCell({ children: [new D.Paragraph(c.name || '')] }),
+        new D.TableCell({ children: [new D.Paragraph(String(c.weight || ''))] }),
+        new D.TableCell({ children: [new D.Paragraph({ children: [new D.TextRun({ text: c.formula || '', font: 'Courier New' })] })] }),
+        new D.TableCell({ children: [new D.Paragraph(c.description || '')] })
+      ]
+    }));
+    return new D.Table({
+      width: { size: 100, type: D.WidthType.PERCENTAGE },
+      rows: [headerRow, ...dataRows]
+    });
+  }
+
+  // -------- HELPER: atitikties lentelė (Priedas Nr. 1) --------
+  function buildDocxComplianceTable(D, items) {
+    const headers = ['TS p.', 'Reikalavimas', 'Tiekėjo siūlomas sprendimas', 'Atitikimo įrodymas', 'Atitinka (Taip/Ne)'];
+    const headerRow = new D.TableRow({
+      tableHeader: true,
+      children: headers.map(t => new D.TableCell({
+        shading: { type: D.ShadingType.SOLID, color: '2E3641' },
+        children: [new D.Paragraph({
+          children: [new D.TextRun({ text: t, bold: true, color: 'FFFFFF', size: 18 })]
+        })]
+      }))
+    });
+    const dataRows = items.map(it => new D.TableRow({
+      children: [
+        new D.TableCell({ width: { size: 8, type: D.WidthType.PERCENTAGE }, children: [new D.Paragraph(it.ref || '')] }),
+        new D.TableCell({ width: { size: 42, type: D.WidthType.PERCENTAGE }, children: [new D.Paragraph(it.requirement || '')] }),
+        new D.TableCell({ width: { size: 25, type: D.WidthType.PERCENTAGE }, children: [new D.Paragraph('')] }),
+        new D.TableCell({ width: { size: 17, type: D.WidthType.PERCENTAGE }, children: [new D.Paragraph('')] }),
+        new D.TableCell({ width: { size: 8, type: D.WidthType.PERCENTAGE }, children: [new D.Paragraph('')] })
+      ]
+    }));
+    return new D.Table({
+      width: { size: 100, type: D.WidthType.PERCENTAGE },
+      rows: [headerRow, ...dataRows]
+    });
+  }
+
   return {
     buildTsDocx,
+    buildAndDownloadRealDocx,
     mdToHtml,
     download
   };
