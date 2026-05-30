@@ -1511,6 +1511,10 @@ details[open] summary {
         </div>
       </div>
       <div class="header-actions">
+        <div id="docxStatus" class="header-status" title="docx.js bibliotekos būsena - tikras .docx eksportui">
+          <span class="dot"></span>
+          <span class="label">docx tikr.</span>
+        </div>
         <div id="apiStatus" class="header-status">
           <span class="dot"></span>
           <span class="label">API neprijungtas</span>
@@ -2480,13 +2484,27 @@ details[open] summary {
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<!-- docx.js: tikras .docx generavimas. Saugiai įkraunama su 2 CDN ir aiškia diagnoze. -->
 <script>
-  // Atsarginis CDN tiekėjas jei pirmasis nepasileido
-  if (typeof window.docx === 'undefined') {
-    document.write('<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"><\/script>');
+  window._docxLoadStatus = 'pending';
+  function _loadDocxFallback() {
+    console.warn('[docx.js] Pirmasis CDN nepasileido, bandomas atsarginis...');
+    const s = document.createElement('script');
+    s.src = 'https://unpkg.com/docx@8.5.0/build/index.umd.js';
+    s.onload = function() {
+      window._docxLoadStatus = window.docx ? 'loaded-fallback' : 'failed';
+      console.log('[docx.js] Įkrauta iš atsarginio CDN. window.docx:', typeof window.docx);
+    };
+    s.onerror = function() {
+      window._docxLoadStatus = 'failed';
+      console.error('[docx.js] ABU CDN NEPASILEIDO. Tikras .docx eksportas neveiks.');
+    };
+    document.head.appendChild(s);
   }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"
+        onload="window._docxLoadStatus = window.docx ? 'loaded' : 'failed'; console.log('[docx.js] Pagrindinis CDN įkrautas. window.docx:', typeof window.docx);"
+        onerror="_loadDocxFallback();"></script>
 <script>
   if (window.pdfjsLib) {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -2598,6 +2616,27 @@ const App = (() => {
     }
   }
 
+  function updateDocxStatus() {
+    const el = $('#docxStatus');
+    if (!el) return;
+    const status = window._docxLoadStatus || 'pending';
+    const hasDocx = typeof window.docx !== 'undefined';
+    if (hasDocx) {
+      el.classList.add('connected');
+      el.classList.remove('error');
+      el.querySelector('.label').textContent = '.docx parengtas';
+      el.setAttribute('title', 'docx.js biblioteka įkrauta - eksportas .docx formatu veikia.');
+    } else if (status === 'failed') {
+      el.classList.remove('connected');
+      el.classList.add('error');
+      el.querySelector('.label').textContent = '.docx neveikia';
+      el.setAttribute('title', 'docx.js biblioteka neįkrauta. Eksportas grįš į .doc atsarginį variantą. Galimai CDN užblokuotas.');
+    } else {
+      el.classList.remove('connected', 'error');
+      el.querySelector('.label').textContent = '.docx kraunama...';
+    }
+  }
+
   // --- TABS ---
   function switchTab(name) {
     $$('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
@@ -2627,6 +2666,14 @@ const App = (() => {
 
     updateApiStatus();
     updateStats();
+    updateDocxStatus();
+    // Patikrinti docx.js būseną kelis kartus per pirmus 5 sekundes
+    let checks = 0;
+    const docxCheck = setInterval(() => {
+      updateDocxStatus();
+      checks++;
+      if (typeof window.docx !== 'undefined' || checks >= 10) clearInterval(docxCheck);
+    }, 500);
   }
 
   // --- FILE HANDLING ---
@@ -6168,13 +6215,6 @@ ${rows}
       creator: 'TS Asistentas · Litgrid AB',
       title: ts.title || meta.title || 'Techninė specifikacija',
       description: 'Sugeneruota TS Asistentu',
-      styles: {
-        default: {
-          document: {
-            run: { font: 'Calibri', size: 22 }
-          }
-        }
-      },
       sections: [{
         properties: {
           page: {
