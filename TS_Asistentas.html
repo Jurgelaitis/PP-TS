@@ -2480,7 +2480,13 @@ details[open] summary {
 <!-- External libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://unpkg.com/docx@9.5.0/build/index.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<script>
+  // Atsarginis CDN tiekėjas jei pirmasis nepasileido
+  if (typeof window.docx === 'undefined') {
+    document.write('<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"><\/script>');
+  }
+</script>
 <script>
   if (window.pdfjsLib) {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -3788,21 +3794,38 @@ const App = (() => {
     if (!gen.ts) return toast('Pirmiausia sugeneruokite TS.', 'error');
     const safeTitle = (gen.meta.title || 'TS').replace(/[^a-zA-Z0-9_Ā-ſ\s]/g, '').slice(0, 60).trim().replace(/\s+/g, '_');
     const filename = `${safeTitle}_${Date.now()}`;
-    try {
-      // Bandymas - tikras .docx per docx.js
-      if (window.docx && DocxBuilder.buildAndDownloadRealDocx) {
-        toast('Generuojamas .docx failas...', 'info');
-        await DocxBuilder.buildAndDownloadRealDocx(gen.ts, gen.meta, gen.priceData, filename);
-        toast('.docx failas atsisiunčiamas.', 'success');
-        return;
+
+    // Diagnozė - logoti būseną prieš bandymą
+    console.log('[DOCX export] window.docx loaded:', typeof window.docx !== 'undefined');
+    console.log('[DOCX export] DocxBuilder.buildAndDownloadRealDocx:', typeof DocxBuilder?.buildAndDownloadRealDocx);
+
+    if (!window.docx) {
+      console.error('[DOCX export] docx.js biblioteka NEĮKRAUTA. CDN gali būti užblokuotas arba lėtas.');
+      toast('docx.js biblioteka neįkrauta. Atsisiunčiamas .doc atsarginis variantas.', 'error');
+      try {
+        const html = DocxBuilder.buildTsDocx(gen.ts, gen.meta, gen.priceData);
+        DocxBuilder.download(html, `${filename}.doc`);
+      } catch (e2) {
+        toast('Eksportas nepavyko: ' + e2.message, 'error');
       }
-      throw new Error('docx.js biblioteka neįkrauta');
+      return;
+    }
+
+    try {
+      toast('Generuojamas .docx failas...', 'info');
+      await DocxBuilder.buildAndDownloadRealDocx(gen.ts, gen.meta, gen.priceData, filename);
+      toast('.docx failas atsisiunčiamas.', 'success');
     } catch (err) {
-      console.warn('Tikras .docx nepavyko, naudojama HTML-as-Word atsarginė versija:', err.message);
-      // Fallback - senasis HTML-as-Word .doc
-      const html = DocxBuilder.buildTsDocx(gen.ts, gen.meta, gen.priceData);
-      DocxBuilder.download(html, `${filename}.doc`);
-      toast('Atsisiunčiamas .doc formatas (atsarginė versija).', 'info');
+      console.error('[DOCX export] Tikras .docx nepavyko:', err);
+      console.error('[DOCX export] Stack:', err.stack);
+      toast('docx.js klaida: ' + err.message + '. Naudojama atsarginė versija.', 'error');
+      try {
+        const html = DocxBuilder.buildTsDocx(gen.ts, gen.meta, gen.priceData);
+        DocxBuilder.download(html, `${filename}.doc`);
+        toast('Atsisiunčiamas .doc atsarginis variantas.', 'info');
+      } catch (e2) {
+        toast('Eksportas visiškai nepavyko: ' + e2.message, 'error');
+      }
     }
   }
 
@@ -5979,7 +6002,7 @@ ${rows}
     children.push(new D.Paragraph({
       alignment: D.AlignmentType.CENTER,
       spacing: { before: 2400, after: 240 },
-      children: [new D.TextRun({ text: 'LITGRID AB', size: 22, color: '737483', characterSpacing: 100 })]
+      children: [new D.TextRun({ text: 'LITGRID AB', size: 22, color: '737483' })]
     }));
     children.push(new D.Paragraph({
       alignment: D.AlignmentType.CENTER,
